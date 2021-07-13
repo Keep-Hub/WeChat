@@ -1,0 +1,125 @@
+@charset "UTF-8";
+/**
+ * 这里是uni-app内置的常用样式变量
+ *
+ * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量
+ * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App
+ *
+ */
+/**
+ * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能
+ *
+ * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件
+ */
+/* 颜色变量 */
+/* 行为相关颜色 */
+/* 文字基本颜色 */
+/* 背景颜色 */
+/* 边框颜色 */
+/* 尺寸变量 */
+/* 文字尺寸 */
+/* 图片尺寸 */
+/* Border Radius */
+/* 水平间距 */
+/* 垂直间距 */
+/* 透明度 */
+/* 文章场景相关 */
+.w-100 {
+  -webkit-animation: fadeInOut .2s linear forwards;
+          animation: fadeInOut .2s linear forwards;
+}
+@-webkit-keyframes fadeInOut {
+0% {
+    width: 200rpx;
+}
+100% {
+    width: 410rpx;
+    /*结尾状态 透明度为1*/
+}
+}
+@keyframes fadeInOut {
+0% {
+    width: 200rpx;
+}
+100% {
+    width: 410rpx;
+    /*结尾状态 透明度为1*/
+}
+}
+.swipe-btn {
+  color: #FFFFFF;
+  text-align: center;
+  line-height: 140rpx;
+  padding: 0 30rpx;
+}
+.user-avatar {
+  width: 100%;
+  background-color: #FFFFFF;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: row;
+          flex-direction: row;
+}
+.user-avatar .pd-20 {
+  padding: 20rpx 0;
+}
+.user-avatar .left {
+  height: 100rpx;
+  width: 100rpx;
+  margin: 0 20rpx;
+  position: relative;
+}
+.user-avatar .left image {
+  width: 100rpx;
+  height: 100%;
+  -webkit-border-radius: 10rpx;
+          border-radius: 10rpx;
+}
+.user-avatar .left .msg-hot {
+  position: absolute;
+  top: 10rpx;
+  height: 30rpx;
+  line-height: 30rpx;
+  right: -10rpx;
+  padding: 2rpx 10rpx;
+  font-size: 24rpx;
+  color: #FFFFFF;
+  background-color: red;
+  -webkit-border-radius: 16rpx;
+          border-radius: 16rpx;
+}
+.user-avatar .center {
+  -webkit-box-flex: 1;
+          flex: 1;
+  min-width: 0;
+  height: 100rpx;
+  border-bottom: 1rpx solid #f4f4f4;
+  -webkit-flex: 1;
+}
+.user-avatar .center .nike-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 32rpx;
+  margin: 8rpx 0;
+}
+.user-avatar .center .new-msg {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 26rpx;
+  color: #7f7f7f;
+}
+.user-avatar .right {
+  width: 110rpx;
+  height: 100rpx;
+  font-size: 24rpx;
+  padding-right: 20rpx !important;
+  color: #7f7f7f;
+  text-align: right;
+  border-bottom: 1rpx solid #f4f4f4;
+}
+
