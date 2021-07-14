@@ -1,26 +1,5 @@
 <template>
 	<view>
-	  <!-- <view class="user-avatar margin-bt" v-for="(item, index) in chatList" :key="index">
-	  	<view class="left">
-	  		<image :src="item.img" mode=""></image>
-			<view class="msg-hot" v-if="item.hot !== 0">
-				{{item.hot}}
-			</view>
-	  	</view>
-		<view class="center new-msg">
-			<view class="nike-name">
-				{{item.name}}
-			</view>
-			
-			<view class="new-msg">
-				{{item.new}}
-			</view>
-		</view>
-	  	<view class="right">
-			{{item.time}}
-	  	</view>
-	  </view>
-	  -->
 	  <uni-swipe-action>
 	      <uni-swipe-action-item v-for="(item, index) in chatList" :autoClose="item.swipe" :show="item.showSwipe" :key="index" :right-options="options"  @change="swipeChange($event, index)">
 	          <view class="user-avatar margin-bt" @touchend="recoveryShow(item)" @tap="bindClick(item)">
