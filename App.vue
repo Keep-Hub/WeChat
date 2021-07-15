@@ -3,7 +3,8 @@
 	import {mapActions} from 'vuex'
 	export default {
 		onLaunch: function() {
-			// 手机禁止横屏 app
+			// uni.clearStorage();
+			// 手机禁止横屏 app 
 			// plus.screen.lockOrientation("portrait-primary");
 			uni.getStorage({
 				key: 'token',
@@ -25,8 +26,12 @@
 				},
 				fail: (res) => {
 					console.log(res)
+					uni.reLaunch({
+							url: './pages/logon/login'
+					});
 				}
-			});  
+			});
+			this.getChatList()
 		},
 		onShow: function() {
 			uni.getStorage({
@@ -41,7 +46,7 @@
 			// console.log('App Hide')
 		},
 		methods: {  
-		    ...mapActions(['getLoginToken'])  
+		    ...mapActions(['getLoginToken', 'getChatList'])  
 		}  
 	}
 </script>

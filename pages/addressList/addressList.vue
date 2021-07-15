@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<uni-indexed-list :options="list" :showSelect="false" @click="bindClick()"></uni-indexed-list>
+		<uni-indexed-list :options="list" :showSelect="false" @click="bindClick($event)"></uni-indexed-list>
 	</view>
 </template>
 
@@ -52,9 +52,6 @@
 		onLoad(option) {
 		},
 		onReady() {
-			uni.setNavigationBarTitle({
-			　　title: '通讯录(' + 12 + ')'
-			})
 			uni.setTabBarBadge({
 				index: 1,
 				text: '99+'
@@ -72,15 +69,27 @@
 			})
 		},
 		methods: {
-			bindClick: function (){
+			bindClick: function (e){
+				const row = e.item.name
+				let newRow = {
+							id: row.buddyId,
+							img: row.img,
+							name: row.nickName,
+							remind: false,
+							swipe: row.swipe,
+							showSwipe: row.showSwipe
+						}
 				uni.navigateTo({
-				    url: '../personal/chatRoom/chatRoom'
+				    url: '../personal/chatRoom/chatRoom?item=' + encodeURIComponent(JSON.stringify(newRow))
 				});
 			},
 			// 昵称排序
 			nickSort: function (id) {
 				userInfoApi.getBuddyList({_id: id}).then(res => {
 					let newArr = []
+					uni.setNavigationBarTitle({
+					　　title: '通讯录(' + res.result.length + ')'
+					})
 					res.result.forEach((item, index) => {
 						res.result[index].fisrt = pinyin.getCamelChars(item.nickName).substring(0, 1).toUpperCase()
 						newArr.push(res.result[index]);

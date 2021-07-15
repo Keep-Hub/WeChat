@@ -105,7 +105,8 @@
 </template>
 
 <script>
-	import {mapActions} from 'vuex'
+	import {mapActions, mapState} from 'vuex'
+	import userInfoApi from '../../../api/userInfo.js'
 	const recorderManager = uni.getRecorderManager();
 	export default {
 		data() {
@@ -114,6 +115,7 @@
 				sendUserInfo: null,
 				mid: 13888888888,
 				chatData: [],
+				getMsgFalg: false, // 开启页面接受socket的消息
 				scrollAnimation: false, // 是否开启滚动动画
 				sendMsg: '', // 发送的内容
 				showSendBtn: false, // 显示发送按钮
@@ -199,9 +201,14 @@
 					this.userInfo = res.data;
 				}
 			})
-			
 			this.sendUserInfo = JSON.parse(decodeURIComponent(option.item));
 			this._getMsg()
+		},
+		onShow () {
+			this.getMsgFalg = true
+		},
+		computed: {
+		    ...mapState(['chatList'])
 		},
 		created() {
 			this.socket.on('connect', () => {
@@ -221,7 +228,7 @@
 			// this.timeConversion()
 		},	
 		methods: {
-			...mapActions(['getUserInfo']),
+			...mapActions(['getUserInfo', 'getChatList']),
 			init: function () {
 				uni.getStorage({
 					key: this.userInfo._id + '_' + this.sendUserInfo.id,
@@ -327,6 +334,7 @@
 					this.chatData.push(sendNewMsg)
 					this.socket.emit('massage', sendNewMsg)
 					uni.setStorage({key: this.userInfo._id + '_' + this.sendUserInfo.id,data: this.chatData})
+					this.updataMsg(sendNewMsg.sendId, sendNewMsg)
 					this.sendMsg = ''
 					this.showSendBtn = false
 				} else if (msgType === 4) {
@@ -397,6 +405,77 @@
 			},
 			onBlur: function () {
 				this.showFocus = false
+			},
+			updataMsg: function (id, data) {
+				let chatList = []
+				uni.getStorage({
+					key: this.userInfo._id + 'chatList',
+					success: (res) => {
+						chatList = res.data
+						chatList.forEach(item => {
+							if (id === item.id) {
+								item.new = data.msg
+								item.time = data.time
+								uni.setStorage({
+									key: this.userInfo._id + 'chatList',
+									data: chatList
+								})
+								this.getChatList()
+							} else {
+								let isIn = chatList.findIndex(item => item.id === id)
+								if (isIn == -1) {
+									userInfoApi.getVerifyBuddy({_id: this.userInfo._id, sendId: data.sendId}).then(res => {
+										const row = res.result[0]
+										let n = {
+												id: row.buddyId,
+												img: row.img,
+												name: row.nickName,
+												new: data.msg,
+												time: data.time,
+												hot: data.hot,
+												remind: false,
+												swipe: row.swipe,
+												showSwipe: row.showSwipe,
+												clickBtnFlag: false,
+												clearTime: null
+											}
+										chatList.push(n)
+										uni.setStorage({
+											key: this.userInfo._id + 'chatList',
+											data: chatList
+										})
+										this.getChatList()
+									})
+								}
+							}
+						})
+					},
+					fail: (err) => {
+						console.log('chuang')
+						userInfoApi.getVerifyBuddy({_id: this.userInfo._id, sendId: data.sendId}).then(res => {
+							const row = res.result[0]
+							let n = {
+									id: row.buddyId,
+									img: row.img,
+									name: row.nickName,
+									new: data.msg,
+									time: data.time,
+									hot: data.hot,
+									remind: false,
+									swipe: row.swipe,
+									showSwipe: row.showSwipe,
+									clickBtnFlag: false,
+									clearTime: null
+								}
+							chatList.push(n)
+							uni.setStorage({
+								key: this.userInfo._id + 'chatList',
+								data: chatList
+							})
+							this.getChatList()
+						})
+					}
+				})
 			},
 			_recording:function (){
 				this.cancalSend = false
@@ -543,6 +622,10 @@
 					}
 				}
 			}
+		},
+		onUnload:function () {
+			console.log('销毁聊天页')
+			this.getMsgFalg = false
 		}
 	}
 </script>

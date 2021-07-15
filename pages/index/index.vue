@@ -41,6 +41,7 @@
 </template>
 
 <script>
+	import {mapState} from 'vuex'
 	import userInfoApi from '../../api/userInfo.js'
 	export default {
 		data() {
@@ -52,44 +53,45 @@
 					btnDelete: "删除",
 					setTime: null,
 					btnFlag: 0, // 1 2 3
-		            chatList: [{
-						id: '60d04bd51a85fe5394c33b90',
-						img: '../../static/lufei.jpg',
-						name: '1743413502@163.com',
-						new: '我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息',
-						time: '10:30',
-						hot: 99,
-						remind: false,
-						swipe: true,
-						showSwipe: "none",
-						clickBtnFlag: false,
-						clearTime: null
+		   //          chatList: [{
+					// 	id: '60d04bd51a85fe5394c33b90',
+					// 	img: '../../static/lufei.jpg',
+					// 	name: '1743413502@163.com',
+					// 	new: '我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息',
+					// 	time: '10:30',
+					// 	hot: 99,
+					// 	remind: false,
+					// 	swipe: true,
+					// 	showSwipe: "none",
+					// 	clickBtnFlag: false,
+					// 	clearTime: null
 						
-					},{
-						id: '60d041cf4b33000035006098',
-						img: '../../static/lufei.jpg',
-						name: '1427316264@qq.com',
-						new: '我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息',
-						time: '周五',
-						hot: 8,
-						remind: false,
-						swipe: true,
-						showSwipe: "none",
-						clickBtnFlag: false,
-						clearTime: null
-					},{
-						id: '60cc4a0b8fc9ad5e981d3e4e',
-						img: '../../static/lufei.jpg',
-						name: '1743413502@qq.com',
-						new: '我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息',
-						time: '2021/6/15',
-						hot: 0,
-						remind: false,
-						swipe: true,
-						showSwipe: "none",
-						clickBtnFlag: false,
-						clearTime: null
-					}],
+					// },{
+					// 	id: '60d041cf4b33000035006098',
+					// 	img: '../../static/lufei.jpg',
+					// 	name: '1427316264@qq.com',
+					// 	new: '我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息',
+					// 	time: '周五',
+					// 	hot: 8,
+					// 	remind: false,
+					// 	swipe: true,
+					// 	showSwipe: "none",
+					// 	clickBtnFlag: false,
+					// 	clearTime: null
+					// },{
+					// 	id: '60cc4a0b8fc9ad5e981d3e4e',
+					// 	img: '../../static/lufei.jpg',
+					// 	name: '1743413502@qq.com',
+					// 	new: '我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息',
+					// 	time: '2021/6/15',
+					// 	hot: 0,
+					// 	remind: false,
+					// 	swipe: true,
+					// 	showSwipe: "none",
+					// 	clickBtnFlag: false,
+					// 	clearTime: null
+					// }],
+					chatList: [],
 					options:[
 							{
 								text: '标记未读',
@@ -112,9 +114,6 @@
 		        }
 		    },
 		    onLoad() {
-				// userInfoApi.getVerifyBuddy({_id: this.userInfo._id, sendId:}).then(res => {
-				// 	console.log(res)
-				// })
 				uni.getStorage({
 					key: 'userInfo',
 					success: (res) => {
@@ -122,20 +121,67 @@
 					}
 				})
 		    },
+			watch: {
+				'chatList1': {
+				    handler(newVal, oldVal) {
+						setTimeout(() => {
+							this.chatList = newVal
+							// location.reload()
+							console.log(newVal)
+						}, 10)
+				    },
+				    deep: true
+				},
+				// $route(to,from) {
+				// 	console.log(from.path)
+				// }
+			},
+			onShow () {
+				// this.chatList = this.chatList1
+			},
+			computed: {
+			    ...mapState(['chatList1'])
+			},
 			mounted(){
+				this.chatList = this.chatList1
 				this.init()
 			},
 		    methods: {
 				init: function() {
 					this.socket.on('getMassage', data => {
+						let chatData = []
 						uni.getStorage({
 							key: this.userInfo._id + '_' + data.userId,
 							success: (res) => {
-								this.chatData = res.data;
+								chatData = res.data;
+							},
+							fail: (err) => {
+								userInfoApi.getVerifyBuddy({_id: this.userInfo._id, sendId: data.userId}).then(res => {
+									const row = res.result[0]
+									let n = {
+											id: row.buddyId,
+											img: row.img,
+											name: row.nickName,
+											new: data.msg,
+											time: data.time,
+											hot: data.hot,
+											remind: false,
+											swipe: row.swipe,
+											showSwipe: row.showSwipe,
+											clickBtnFlag: false,
+											clearTime: null
+										}
+									this.chatList.push(n)
+									uni.setStorage({
+										key: this.userInfo._id + 'chatList',
+										data: this.chatList
+									})
+								})
 							}
 						})
-						this.chatData.push(data)
-						uni.setStorage({key: this.userInfo._id + '_' + data.userId,data: this.chatData})
+						chatData.push(data)
+						this.updataMsg(data.userId, data)
+						uni.setStorage({key: this.userInfo._id + '_' + data.userId,data: chatData})
 					})
 				},
 				swipeChange(e,index){
@@ -188,6 +234,18 @@
 					this.btnTab = "标记未读"
 					this.btnShow = "不显示"
 					this.btnDelete = "删除"
+				},
+				updataMsg: function (id, data) {
+					this.chatList.forEach(item => {
+						if (id === item.id) {
+							item.new = data.msg
+							item.time = data.time
+						}
+					})
+					uni.setStorage({
+						key: this.userInfo._id + 'chatList',
+						data: this.chatList
+					})
 				}
 		    }
 	}

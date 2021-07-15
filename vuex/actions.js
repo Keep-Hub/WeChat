@@ -4,3 +4,9 @@ export const getLoginToken = ({commit}, params) => {
 export const getUserInfo = ({commit}, params) => {
   commit('getUserInfo', params)
 }
+export const quitLogin = ({commit}, params) => {
+  commit('quitLogin', params)
+}
+export const getChatList = ({commit}, params) => {
+  commit('getChatList', params)
+}

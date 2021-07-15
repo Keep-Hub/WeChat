@@ -13,7 +13,7 @@
 			</view>
 		</view>
 		<view class="list">
-			<view style="width: 100%;text-align: center;font-size: 32rpx;padding: 30rpx 0; color: #dd524d;">
+			<view style="width: 100%;text-align: center;font-size: 32rpx;padding: 30rpx 0; color: #dd524d;" @tap="_quitLogin">
 				退出登录
 			</view>
 		</view>
@@ -21,6 +21,7 @@
 </template>
 
 <script>
+	import {mapActions} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -83,7 +84,14 @@
 			})
 		},
 		methods: {
-			
+			...mapActions(['quitLogin']),
+			_quitLogin: function() {
+				this.quitLogin()
+				uni.reLaunch({
+						url: '../../logon/login'
+				});
+				// this.$router.go(0)
+			}
 		}
 	}
 </script>

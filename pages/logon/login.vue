@@ -116,11 +116,11 @@ export default {
 				password: this.password,
 			}
 			logonApi.login(params).then(data => {
-				console.log(data.message)
 				if (data.code === 2000) {
 					this.token = data.token
 					// uni.setStorageSync('token', data.token)
 					this.getLoginToken(data)
+					this.socket.emit('setRoom',{"_id": data.result[0]._id})
 					uni.switchTab({
 					    url: '../index/index'
 					});
