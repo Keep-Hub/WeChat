@@ -1,7 +1,7 @@
 <template>
 	<view>
 	  <uni-swipe-action>
-	      <uni-swipe-action-item v-for="(item, index) in chatList" :autoClose="item.swipe" :show="item.showSwipe" :key="index" :right-options="options"  @change="swipeChange($event, index)">
+	      <uni-swipe-action-item v-for="(item, index) in chatList" :key="index" :autoClose="item.swipe" :show="item.showSwipe" :right-options="options"  @change="swipeChange($event, index)">
 	          <view class="user-avatar margin-bt" @touchend="recoveryShow(item)" @tap="bindClick(item)">
 	          	<view class="left pd-20">
 	          		<image :src="item.img" mode=""></image>
@@ -19,7 +19,7 @@
 	          			</view>
 	          		</view>
 	          	<view class="right pd-20">
-	          			{{item.time}}
+	          			{{timeConversion(item.time)}}
 	          	</view>
 	          </view>
 			  <template v-slot:right>
@@ -41,12 +41,11 @@
 </template>
 
 <script>
-	import {mapState} from 'vuex'
+	import {mapState, mapActions} from 'vuex'
 	import userInfoApi from '../../api/userInfo.js'
 	export default {
 		data() {
 		        return {
-					userInfo: {},
 					chatData: [],
 					btnTab: "标记未读",
 					btnShow: "不显示",
@@ -66,32 +65,7 @@
 					// 	clickBtnFlag: false,
 					// 	clearTime: null
 						
-					// },{
-					// 	id: '60d041cf4b33000035006098',
-					// 	img: '../../static/lufei.jpg',
-					// 	name: '1427316264@qq.com',
-					// 	new: '我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息',
-					// 	time: '周五',
-					// 	hot: 8,
-					// 	remind: false,
-					// 	swipe: true,
-					// 	showSwipe: "none",
-					// 	clickBtnFlag: false,
-					// 	clearTime: null
-					// },{
-					// 	id: '60cc4a0b8fc9ad5e981d3e4e',
-					// 	img: '../../static/lufei.jpg',
-					// 	name: '1743413502@qq.com',
-					// 	new: '我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息我是新的消息',
-					// 	time: '2021/6/15',
-					// 	hot: 0,
-					// 	remind: false,
-					// 	swipe: true,
-					// 	showSwipe: "none",
-					// 	clickBtnFlag: false,
-					// 	clearTime: null
 					// }],
-					chatList: [],
 					options:[
 							{
 								text: '标记未读',
@@ -114,41 +88,38 @@
 		        }
 		    },
 		    onLoad() {
-				uni.getStorage({
-					key: 'userInfo',
-					success: (res) => {
-						this.userInfo = res.data;
-					}
-				})
+				// console.log(Date.parse(new Date(a.time)))
+				// new Date(Date.parse(a.time))
 		    },
 			watch: {
-				'chatList1': {
-				    handler(newVal, oldVal) {
-						setTimeout(() => {
-							this.chatList = newVal
-							// location.reload()
-							console.log(newVal)
-						}, 10)
-				    },
-				    deep: true
-				},
-				// $route(to,from) {
-				// 	console.log(from.path)
-				// }
 			},
 			onShow () {
-				// this.chatList = this.chatList1
+				this.getChatList()
+				this.$nextTick(function(){
+					this.chatList.sort((a,b) => {
+						 return Date.parse(new Date(b.time)) - Date.parse(new Date(a.time))
+					})
+				})
 			},
 			computed: {
-			    ...mapState(['chatList1'])
+			    ...mapState(['userInfo','chatList'])
 			},
 			mounted(){
-				this.chatList = this.chatList1
 				this.init()
+				uni.$on('updataChatList', (data) => {
+					this.getChatList()
+					this.chatList.sort((a,b) => {
+						 return Date.parse(new Date(b.time)) - Date.parse(new Date(a.time))
+					})
+				})
 			},
 		    methods: {
+				...mapActions(['getChatList']),
 				init: function() {
 					this.socket.on('getMassage', data => {
+						this.chatList.sort((a,b) => {
+							 return Date.parse(new Date(b.time)) - Date.parse(new Date(a.time))
+						})
 						let chatData = []
 						uni.getStorage({
 							key: this.userInfo._id + '_' + data.userId,
@@ -246,7 +217,45 @@
 						key: this.userInfo._id + 'chatList',
 						data: this.chatList
 					})
-				}
+				},
+				getNowTime: function (value, format) {// value - 标准时间 format: 0-日期+时间 1-时分 2-星期 3-日期
+					let date = new Date(value)
+					let week = date.getDay();
+					let weeks = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
+					let y = date.getFullYear()
+					let m = date.getMonth() + 1
+					let d = date.getDate()
+					let hh = date.getHours()
+					let mm = date.getMinutes()
+					let ss = date.getSeconds()
+					m = m < 10 ? '0' + m : m
+					d = d < 10 ? '0' + d : d
+					hh = hh < 10 ? '0' + hh : hh
+					mm = mm < 10 ? '0' + mm : mm
+					ss = ss < 10 ? '0' + ss : ss
+					if (format === 1) {
+						return (hh + ':'+ mm)
+					} else if (format === 2) {
+						return weeks[week] + ' ' + (hh + ':'+ mm)
+					} else if (format === 3) {
+						return (y + '-' + m + '-' + d)
+					} else {
+						return (y + '-' + m + '-' + d + ' ' + hh + ':'+ mm)
+					}
+				},
+				timeConversion: function (n) {
+					let nowTime = Date.parse(this.getNowTime(Date.parse(new Date()), 3))
+					let oldTime = Date.parse(this.getNowTime(n, 3))
+					if ((nowTime - oldTime)/(3600000*24) === 0) {
+						return this.getNowTime(n, 1)
+					} else if ((nowTime - oldTime)/(3600000*24) === 1) {
+						return '昨天 ' + this.getNowTime(n, 1)
+					} else if ((nowTime - oldTime)/(3600000*24) <= 6) {
+						return this.getNowTime(n, 2)
+					} else {
+						return this.getNowTime(n, 0)
+					}
+				},
 		    }
 	}
 </script>

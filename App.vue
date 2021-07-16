@@ -3,9 +3,20 @@
 	import {mapActions} from 'vuex'
 	export default {
 		onLaunch: function() {
-			// uni.clearStorage();
-			// 手机禁止横屏 app 
-			// plus.screen.lockOrientation("portrait-primary");
+			  // uni.clearStorage();
+			  switch(uni.getSystemInfoSync().platform){
+			      case 'android':
+			         console.log('运行Android上')
+					 // 手机禁止横屏 app
+					 plus.screen.lockOrientation("portrait-primary");
+			         break;
+			      case 'ios':
+			         console.log('运行iOS上')
+			         break;
+			      default:
+			         console.log('运行在开发者工具上')
+			         break;
+			  }
 			uni.getStorage({
 				key: 'token',
 				success:(res) => {
@@ -31,6 +42,7 @@
 					});
 				}
 			});
+			this.getUserInfo()
 			this.getChatList()
 		},
 		onShow: function() {
@@ -46,7 +58,7 @@
 			// console.log('App Hide')
 		},
 		methods: {  
-		    ...mapActions(['getLoginToken', 'getChatList'])  
+		    ...mapActions(['getLoginToken', 'getChatList', 'getUserInfo'])  
 		}  
 	}
 </script>

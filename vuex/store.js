@@ -5,8 +5,10 @@ Vue.use(Vuex)
 // 应用初始状态
 const state = {
 	loginState: false,
-	userInfo: {},
-	chatList1: []
+	userInfo: {
+		id: 123
+	},
+	chatList: []
 }
 // 定义所需的 mutations
 const mutations = {
@@ -19,7 +21,7 @@ const mutations = {
 	}
   },
   getUserInfo: (state, data) => {
-	  return state.userInfo
+	  state.userInfo = uni.getStorageSync('userInfo')
   },
   quitLogin: (state, data) => {
 	  uni.removeStorage({
@@ -37,9 +39,8 @@ const mutations = {
 	  console.log('退出登录')
   },
   getChatList(state, data) {
-	  state.userInfo = uni.getStorageSync('userInfo')
 	  let list = uni.getStorageSync(state.userInfo._id + 'chatList')
-	  state.chatList1 = list === '' ? [] : list
+	  state.chatList = list === '' ? [] : list
   }
 }
 // 创建 store 实例
