@@ -10,3 +10,6 @@ export const quitLogin = ({commit}, params) => {
 export const getChatList = ({commit}, params) => {
   commit('getChatList', params)
 }
+export const getAllBadge = ({commit}, params) => {
+  commit('getAllBadge', params)
+}

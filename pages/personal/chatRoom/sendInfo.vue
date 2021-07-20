@@ -176,7 +176,7 @@
 						time: new Date(),
 						msgType: msgType, // 1-文字 2-图片 3-视频 4-语音 5-红包 6-表情
 						msg: msg,
-						hot: 1,
+						hot: 0,
 						voiceTime: voiceT,
 						move: 0
 					}

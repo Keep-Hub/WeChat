@@ -4,9 +4,10 @@
 		},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
-			"path": "pages/index/index",
+			"path": "pages/wechat/wechat",
 			"style": {
 				"navigationBarTitleText": "微信",
+				"enablePullDownRefresh": true,
 				"app-plus": {
 					"titleNView": {
 						"buttons":[
@@ -18,12 +19,6 @@
 							    "fontSrc": "/static/iconfont.ttf",
 							    "fontSize": "20px",
 								"width": "30px"
-							},
-							{
-							    "text": "\ue65c",
-							    "fontSrc": "/static/iconfont.ttf",
-							    "fontSize": "20px",
-								"width": "35px"
 							}
 						]
 					}
@@ -45,12 +40,6 @@
 							    "fontSrc": "/static/iconfont.ttf",
 							    "fontSize": "20px",
 								"width": "30px"
-							},
-							{
-							    "text": "\ue65c",
-							    "fontSrc": "/static/iconfont.ttf",
-							    "fontSize": "20px",
-								"width": "35px"
 							}
 						]
 					}
@@ -72,12 +61,6 @@
 							    "fontSrc": "/static/iconfont.ttf",
 							    "fontSize": "20px",
 								"width": "30px"
-							},
-							{
-							    "text": "\ue65c",
-							    "fontSrc": "/static/iconfont.ttf",
-							    "fontSize": "20px",
-								"width": "35px"
 							}
 						]
 					}
@@ -110,7 +93,7 @@
             "style" :                                                                                    
 				{
 					"navigationBarTitleText": "",
-					"enablePullDownRefresh": false,
+					"enablePullDownRefresh": true,
 					"app-plus": {
 						"titleNView": {
 							"buttons":[
@@ -161,15 +144,6 @@
 				}
 		    
 		}
-        ,{
-            "path" : "pages/index/index",
-            "style" :                                                                                    
-            {
-                "navigationBarTitleText": "",
-                "enablePullDownRefresh": false
-            }
-            
-        }
     ],
 	"tabBar": {
 	    "color": "#010101",
@@ -177,7 +151,7 @@
 	    "borderStyle": "black",
 	    "backgroundColor": "#f7f7f7",
 	    "list": [{
-	        "pagePath": "pages/index/index",
+	        "pagePath": "pages/wechat/wechat",
 	        "iconPath": "static/tabbarImg/wechat.png",
 	        "selectedIconPath": "static/tabbarImg/wechat1.png",
 	        "text": "微信"

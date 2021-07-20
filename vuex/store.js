@@ -8,7 +8,8 @@ const state = {
 	userInfo: {
 		id: 123
 	},
-	chatList: []
+	chatList: [],
+	AllBadge: {}
 }
 // 定义所需的 mutations
 const mutations = {
@@ -40,7 +41,34 @@ const mutations = {
   },
   getChatList(state, data) {
 	  let list = uni.getStorageSync(state.userInfo._id + 'chatList')
-	  state.chatList = list === '' ? [] : list
+	  state.chatList = list === '' ? [] : list,
+	  state.chatList.sort((a,b) => {
+	  	 return Date.parse(new Date(b.time)) - Date.parse(new Date(a.time))
+	  })
+  },
+  getAllBadge (state, data) {
+	  // state.chatList.forEach(item => {
+		 //  uni.getStorage({
+			// key: state.userInfo._id + '_' + item.id,
+			// success: (res) => {
+			// 	let nub = 0
+			// 	let ind = res.data.length
+			// 	res.data.slice(ind - 100, ind).forEach(i => {
+			// 		if (i.hot === 1) {
+			// 			nub++
+			// 		}
+			// 	})
+			// 	item.hot = nub > 99 ? 99 : nub,
+			// 	state.AllBadge.unreadMsg = state.chatList.reduce((pre,cur)=>{
+			// 	    return pre+cur.hot	
+			// 	},0)
+			// 	// //  nub = 0
+			// }
+		 //  })
+	  // })
+	  // state.AllBadge.unreadMsg = state.chatList.reduce((pre,cur)=>{
+	  //     return pre+cur.hot	
+	  // },0)
   }
 }
 // 创建 store 实例

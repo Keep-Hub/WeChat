@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<scroll-view style="position: absolute;" @tap="bigView()" @touchstart="bigView()" id="scrollview" scroll-y="false" :style="{height: (style.contentViewHeight*2 + 140) + 'rpx'}" :scroll-with-animation="scrollAnimation" :scroll-y="true" :scroll-into-view="scrollToView">
+		<scroll-view style="position: absolute;margin-bottom: 100rpx;" @tap="bigView()" @touchstart="bigView()" id="scrollview" scroll-y="false" :style="{height: (style.contentViewHeight*2 + chatScreen) + 'rpx'}" :scroll-with-animation="scrollAnimation" :scroll-y="true" :scroll-into-view="scrollToView">
 			<view v-for="(item, index) in chatData" :key="index" :id="'msg' + index">
 				<view v-if="fiveMinutesApart(item.time, index, chatData)" class="send-time">
 					<text>{{timeConversion(item.time)}}</text>
@@ -34,8 +34,8 @@
 											<view class="voice-circle third" :class="item.move === 1 ? 'third-animation' : ''"></view>
 										</view>
 									</view>
-									<text class="voice-time" v-if="item.uId === 1" :style="{ width: (item.voiceTime * 4) + 'rpx' }">{{item.voiceTime}}″</text>
-									<text class="voice-red-hot" v-if="item.uId === 1 && item.hot === 1"></text>
+									<text class="voice-time" v-if="item.userId === userInfo._id" :style="{ width: (item.voiceTime * 4) + 'rpx' }">{{item.voiceTime}}″</text>
+									<text class="voice-red-hot" v-if="item.userId === userInfo._id && item.hot === true"></text>
 								 </view>
 							</view>	
 						</view>
@@ -59,6 +59,7 @@
 		data() {
 			return {
 				scrollToView: '',
+				chatScreen: 0,
 				sendUserInfo: null,
 				chatData: [],
 				getMsgFalg: false, // 开启页面接受socket的消息
@@ -113,9 +114,20 @@
 			});
 			 const res = uni.getSystemInfoSync()   //获取手机可使用窗口高度     api为获取系统信息同步接口
 		　　　this.style.pageHeight = res.windowHeight
-		　　　this.style.contentViewHeight = res.windowHeight - uni.getSystemInfoSync().screenWidth / 750 * (100) - 70 //像素   因为给出的是像素高度 然后我们用的是upx  所以换算一下 
+		　　　this.style.contentViewHeight = res.windowHeight - uni.getSystemInfoSync().screenWidth / 750 * (100) //像素   因为给出的是像素高度 然后我们用的是upx  所以换算一下 
+		},
+		onPullDownRefresh() {
+				console.log('refresh');
+				setTimeout(function () {
+					uni.stopPullDownRefresh();
+				}, 1000);
 		},
 		mounted(){
+			if (uni.getSystemInfoSync().platform === 'android') {
+				this.chatScreen = 45
+			} else {
+				this.chatScreen = 0
+			}
 			this._getMsg()
 			uni.$on('getSendData', (data) => {
 				this.socket.emit('massage', data)
@@ -129,7 +141,6 @@
 			// this.timeConversion()
 		},	
 		methods: {
-			
 			...mapActions(['getUserInfo', 'getChatList']),
 			init: function () {
 				uni.getStorage({
@@ -205,9 +216,11 @@
 			},
 			_getMsg: function () {
 				this.socket.on('getMassage', data => {
-					if (data.userId === this.sendUserInfo.id) {
+					if (data.userId === this.sendUserInfo.id && this.getMsgFalg === true) {
+						data.hot = 0
 						this.chatData.push(data)
 						uni.setStorage({key: data.sendId + '_' + data.userId,data: this.chatData})
+						this.getChatList()
 						this.$nextTick(function(){
 							this.scrollToView = 'msg' + (this.chatData.length - 1)
 						})
@@ -324,7 +337,7 @@
 				this.old.y = e.detail.y
 			},
 			playVoice: function (e) {
-				e.hot = 0
+				e.hot = false
 				this.chatData.forEach(i => {
 					if (i.msgType === 4) {
 						console.log(i.move)
@@ -399,6 +412,8 @@
 			this.getMsgFalg = false
 			uni.$off('updataChatList')
 			uni.$off('getSendData')
+			this.getChatList()
+			uni.$emit('setTabBarItem')
 		}
 	}
 </script>

@@ -1,6 +1,6 @@
 <script>
 	import logonApi from './api/logon'
-	import {mapActions} from 'vuex'
+	import {mapState, mapActions} from 'vuex'
 	export default {
 		onLaunch: function() {
 			  // uni.clearStorage();
@@ -43,14 +43,28 @@
 				}
 			});
 			this.getUserInfo()
-			this.getChatList()
+		},
+		computed: {
+		    ...mapState(['userInfo','chatList','AllBadge'])
 		},
 		onShow: function() {
+			this.getChatList()
+			this.getAllBadge()
+			this.getBadge(this.AllBadge)
 			uni.getStorage({
 				key: 'userInfo',
 				success: (res) => {
 					this.socket.emit('setRoom',{"_id": res.data._id})
+					console.log('连接websocket')
+				},
+				fail: (err) => {
+					console.log('用户信息无效')
 				}
+			})
+			uni.$on('setTabBarItem', res => {
+				this.getChatList()
+				this.getAllBadge()
+				this.getBadge(this.AllBadge)
 			})
 			// console.log('App Show')
 		},
@@ -58,7 +72,19 @@
 			// console.log('App Hide')
 		},
 		methods: {  
-		    ...mapActions(['getLoginToken', 'getChatList', 'getUserInfo'])  
+		    ...mapActions(['getLoginToken', 'getChatList', 'getUserInfo', 'getAllBadge']),
+			getBadge: function (data) {
+				if (data.unreadMsg > 0) {
+					uni.setTabBarBadge({
+						index: 0,
+						text: data.unreadMsg >= 99 ? '99+' : data.unreadMsg.toString()
+					})
+				} else {
+					uni.hideTabBarRedDot({
+						index: 0,
+					})
+				}
+			}
 		}  
 	}
 </script>

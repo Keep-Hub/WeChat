@@ -34,7 +34,7 @@
 			</u-field>
 		</view>
 		<u-button class="btn" size="medium"  type="success" @tap="_login">登录</u-button>
-		<u-button class="btn" size="medium"  type="success" @tap="_TOKEN">TOKEN</u-button>
+		<u-button class="btn" size="medium"  type="success" @tap="_TOKEN">清除本地</u-button>
 		<u-modal v-model="showModal" :content="content" :show-cancel-button="true" :show-title="false" @confirm="confirmModel" @cancel="cancelModel"></u-modal>
 		<u-toast ref="uToast"/>
 	</view>
@@ -122,7 +122,7 @@ export default {
 					this.getLoginToken(data)
 					this.socket.emit('setRoom',{"_id": data.result[0]._id})
 					uni.switchTab({
-					    url: '../index/index'
+					    url: '../wechat/wechat'
 					});
 				}
 				this.$refs.uToast.show({
@@ -133,10 +133,7 @@ export default {
 			})
 		},
 		_TOKEN () {
-			logonApi.testToken({token: this.token}).then(data => {
-				// console.log(new Date(parseInt(data.createTime)))
-				// console.log(new Date(parseInt(data.createTime + data.expiresIn)))	
-			})
+			uni.clearStorage()
 		},
   		confirmModel () {
 		},
