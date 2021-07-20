@@ -129,12 +129,6 @@
 								uni.setStorage({key: this.userInfo._id + '_' + data.userId,data: chatData})
 							}
 						})
-						var pages = getCurrentPages(); //当前页
-						if (pages[pages.length - 1].route === 'pages/wechat/wechat') {
-							uni.setNavigationBarTitle({
-							　　title: this.AllBadge.unreadMsg > 0 ? '微信(' + (this.AllBadge.unreadMsg >= 99? '99+' : this.AllBadge.unreadMsg) + ')' : '微信'
-							})
-						}
 						this.$nextTick(function(){
 							this.updataMsg(data.userId, data)
 						})
@@ -242,6 +236,14 @@
 							}
 							this.getChatList()
 							uni.$emit('setTabBarItem')
+							this.$nextTick(function(){
+								let pages = getCurrentPages(); //当前页
+								if (pages[pages.length - 1].route === 'pages/wechat/wechat') {
+									uni.setNavigationBarTitle({
+									　　title: this.AllBadge.unreadMsg > 0 ? '微信(' + (this.AllBadge.unreadMsg >= 99? '99+' : this.AllBadge.unreadMsg) + ')' : '微信'
+									})
+								}
+							})
 						},
 						fail: (err) => {
 							userInfoApi.getVerifyBuddy({_id: this.userInfo._id, sendId: data.userId}).then(res => {

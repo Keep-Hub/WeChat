@@ -47,28 +47,21 @@ const mutations = {
 	  })
   },
   getAllBadge (state, data) {
-	  // state.chatList.forEach(item => {
-		 //  uni.getStorage({
-			// key: state.userInfo._id + '_' + item.id,
-			// success: (res) => {
-			// 	let nub = 0
-			// 	let ind = res.data.length
-			// 	res.data.slice(ind - 100, ind).forEach(i => {
-			// 		if (i.hot === 1) {
-			// 			nub++
-			// 		}
-			// 	})
-			// 	item.hot = nub > 99 ? 99 : nub,
-			// 	state.AllBadge.unreadMsg = state.chatList.reduce((pre,cur)=>{
-			// 	    return pre+cur.hot	
-			// 	},0)
-			// 	// //  nub = 0
-			// }
-		 //  })
-	  // })
-	  // state.AllBadge.unreadMsg = state.chatList.reduce((pre,cur)=>{
-	  //     return pre+cur.hot	
-	  // },0)
+	  state.chatList.forEach(item => {
+		  let nub = []
+		  state.chatList.forEach(item => {
+			  let row = uni.getStorageSync(state.userInfo._id + '_' + item.id)
+			  let itemNub = row.slice(row.length - 100, row.length).reduce((pre,cur)=>{
+								return pre+cur.hot	
+							},0)
+			  item.hot = itemNub
+			  nub.push(itemNub)
+		  })
+		  state.AllBadge.unreadMsg = nub.reduce((pre, cur) => {
+		  		  return pre + cur
+		  },0)
+	  })
+	  uni.setStorageSync(state.userInfo._id + 'chatList', state.chatList)
   }
 }
 // 创建 store 实例
