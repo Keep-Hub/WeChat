@@ -1,6 +1,7 @@
 <template>
 	<view>
-		<scroll-view style="position: absolute;margin-bottom: 100rpx;" @tap="bigView()" @touchstart="bigView()" id="scrollview" scroll-y="false" :style="{height: (style.contentViewHeight*2 + chatScreen) + 'rpx'}" :scroll-with-animation="scrollAnimation" :scroll-y="true" :scroll-into-view="scrollToView">
+		<scroll-view @scrolltoupper="_nextPage()" :upper-threshold="50" @tap="bigView()" @touchstart="bigView()" id="scrollview" scroll-y="false" :style="{height: (style.contentViewHeight*2 + chatScreen) + 'rpx', 'padding-bottom': (scrollPadding ? '640rpx' : '0rpx')}" :scroll-with-animation="scrollAnimation" :scroll-y="true" :scroll-into-view="scrollToView">
+			<view v-if="loading"><image class="loading-img" src="../../../static/loading.png" mode=""></image></view>
 			<view v-for="(item, index) in chatData" :key="index" :id="'msg' + index">
 				<view v-if="fiveMinutesApart(item.time, index, chatData)" class="send-time">
 					<text>{{timeConversion(item.time)}}</text>
@@ -42,8 +43,8 @@
 					</view>
 				</view>
 			</view>
-			<send-info :userInfo="userInfo" :sendUserInfo="sendUserInfo"></send-info>
 		</scroll-view>
+		<send-info :userInfo="userInfo" :sendUserInfo="sendUserInfo"></send-info>
 	</view>
 </template>
 
@@ -59,6 +60,8 @@
 		data() {
 			return {
 				scrollToView: '',
+				loading: false,
+				loadAnimation: {},
 				chatScreen: 0,
 				sendUserInfo: null,
 				chatData: [],
@@ -90,20 +93,34 @@
 				},
 				text: 'uni-app',
 				imgUrls: [], // 预览图片路径集合
+				scrollPadding: false,
 				style: {
 				            pageHeight: 0,
 				            contentViewHeight: 0,
 				            footViewHeight: 90,
 				            mitemHeight: 0
-				        }
+				 },
+				 pageNub: 1,
+				 allChatData: [],
 			}
 		},
 		onLoad(option) {
 			this.sendUserInfo = JSON.parse(decodeURIComponent(option.item));
-			this.init()
+			// var animation = uni.createAnimation({
+			//       duration: 1,
+			//       timingFunction: 'step-start',
+			//     })
+			// 	let i = 1
+			//     this.animation = animation
+			//     setInterval(function() {
+			//       animation.rotate(i + 30).step()
+			//       this.loadAnimation = animation.export()
+			// 	  i++
+			//     }.bind(this), 10)
 		},
 		onShow () {
 			this.getMsgFalg = true
+			this.init()
 		},
 		computed: {
 		    ...mapState(['chatList', 'userInfo'])
@@ -117,10 +134,10 @@
 		　　　this.style.contentViewHeight = res.windowHeight - uni.getSystemInfoSync().screenWidth / 750 * (100) //像素   因为给出的是像素高度 然后我们用的是upx  所以换算一下 
 		},
 		onPullDownRefresh() {
-				console.log('refresh');
-				setTimeout(function () {
-					uni.stopPullDownRefresh();
-				}, 1000);
+				// console.log('refresh');
+				// setTimeout(function () {
+				// 	uni.stopPullDownRefresh();
+				// }, 1000);
 		},
 		mounted(){
 			if (uni.getSystemInfoSync().platform === 'android') {
@@ -138,16 +155,51 @@
 					this.scrollToView = 'msg' + (this.chatData.length - 1)
 				})
 			})
+			uni.$on('showFile', (data) => {
+				this.scrollPadding = data
+				this.$forceUpdate()
+				console.log(data)
+			})
 			// this.timeConversion()
 		},	
 		methods: {
 			...mapActions(['getUserInfo', 'getChatList']),
+			_nextPage: function () {
+				this.pageNub++
+				let nowPageData = this.getPages(this.pageNub)
+				if (nowPageData !== false) {
+					this.loading = true
+					setTimeout(() => {
+						nowPageData.reverse().forEach(i => {
+							this.chatData.unshift(i)
+						})
+						this.loading = false
+						this.$nextTick(function(){
+							this.scrollToView = 'msg' + (nowPageData.length - 2)
+						})
+					}, 1200)
+				}
+			},
+			getPages: function (page) {
+				return this.getPageData(page, 18, this.allChatData)
+			},
+			getPageData: function (currentPage, pageSize, objData) {
+			      let totalPage = Math.ceil(objData.length / pageSize) // 先算出一共多少页
+			      if (currentPage > 0 && currentPage < totalPage) {
+			        return objData.slice(objData.length-pageSize * currentPage, objData.length-(currentPage - 1)*pageSize)
+			      } else if (currentPage === totalPage) {
+			        return objData.slice(0, objData.length-(currentPage - 1)*pageSize)
+			      } else {
+					  return false
+				  }
+			},
 			init: function () {
 				uni.getStorage({
 					key: this.userInfo._id + '_' + this.sendUserInfo.id,
 					success: (res) => {
-						this.chatData = res.data;
-						this.$nextTick(function () {
+						this.allChatData = res.data;
+						this.chatData = this.getPages(this.pageNub)
+						this.$nextTick(function(){
 							this.scrollToView = 'msg' + (this.chatData.length - 1)
 						})
 					}
@@ -445,6 +497,18 @@
 			padding: 4rpx 10rpx;
 			border-radius: 6rpx;
 		}
+	}
+	.loading-img{
+		width: 50rpx;
+		height: 50rpx;
+		margin: 0 auto;
+		padding: 30rpx 0;
+		display: block;
+		animation: movea 1s linear infinite;
+	}
+	@keyframes movea {
+	    from {transform: rotate(0deg);}
+	    to {transform: rotate(360deg);}
 	}
 	.chat-list {
 		display: flex;

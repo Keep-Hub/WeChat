@@ -93,7 +93,7 @@
             "style" :                                                                                    
 				{
 					"navigationBarTitleText": "",
-					"enablePullDownRefresh": true,
+					"enablePullDownRefresh": false,
 					"app-plus": {
 						"titleNView": {
 							"buttons":[

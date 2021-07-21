@@ -1,9 +1,9 @@
 <template>
-	<view class="send-main" @tap.stop="stopBigView()" @touchstart.stop="stopBigView()">
+	<view class="send-main">
 		<view class="send-info">
 		<uni-icons v-if="isRecording" class="mic-icon iconfont icon-sound" size="28" @tap="holdToTalk()"></uni-icons>
 		<uni-icons v-else class="mic-icon iconfont icon-jianpan" size="25" @tap="holdToTalk()"></uni-icons>
-		<textarea v-if="isRecording" @input="sendChange()" type="text" confirm-type="send" class="chat-send" :focus="showFocus" @blur="onBlur" v-model="sendMsg" cursor-spacing="5" auto-height="true" show-confirm-bar="false" maxlength="-1" />
+		<textarea v-if="isRecording" @input="sendChange()" type="text" confirm-type="send" class="chat-send" :focus="showFocus"  @tap="onFocus" @blur="onBlur" v-model="sendMsg" cursor-spacing="5" auto-height="true" show-confirm-bar="false" maxlength="-1" />
 		<view class="chat-send recording-a" @touchstart="_recording" @touchend="_stopRecording" @touchmove="_moveCancal" v-else>
 				<view>按住说话</view>
 				<view class="cancal-record" v-if="voicePopup">
@@ -18,11 +18,11 @@
 					</view>
 				</view>
 			</view>
-			<uni-icons class="smile-icon iconfont icon-emoji" size="28" @tap="onFocus"></uni-icons>
-			<view v-if="showSendBtn" class="send-icon" size="small" @tap="_sendMsg(1, sendMsg)">发送</view>
+			<uni-icons class="smile-icon iconfont icon-emoji" size="28"></uni-icons>
+			<view v-if="showSendBtn" class="send-icon" size="small" @touchend.prevent="_sendMsg(1, sendMsg)">发送</view>
 			<uni-icons v-else class="plus-icon iconfont icon-roundadd" size="28" @tap="_addPlus()"></uni-icons>
 		</view>
-		<view v-if="showIconFlie" class="select-main">
+		<view v-if="showIconFile" class="select-main">
 		<view class="uni-padding-wrap" style="padding: 20px 15px;">
 			<view class="page-section swiper">
 				<view class="page-section-spacing">
@@ -30,8 +30,8 @@
 						<swiper-item>
 							<view class="swiper-item">
 								<view class="add-select-list" v-for="(item, index) in sendInfo.slice(0,8)" :key="index">
-									<view class="img-bg">
-										<image :src="item.img" mode=""></image>
+									<view class="add-imgs">
+										<image class="tu" :src="item.img" mode=""></image>
 									</view>
 									<view class="text">
 										{{item.text}}
@@ -42,8 +42,8 @@
 						<swiper-item>
 							<view class="swiper-item">
 								<view class="add-select-list" v-for="(item, index) in sendInfo.slice(8,16)" :key="index">
-									<view class="img-bg">
-										<image :src="item.img" mode=""></image>
+									<view class="add-imgs">
+										<image class="tu" :src="item.img" mode=""></image>
 									</view>
 									<view class="text">
 										{{item.text}}
@@ -71,7 +71,7 @@
 				showSendBtn: false, // 显示发送按钮
 				showFocus: false, // 获取输入框焦点
 				isRecording: true, // 按住说话
-				showIconFlie: false, // 显示文件和表情
+				showIconFile: false, // 显示文件和表情
 				indicatorDots: true,
 				autoplay: false,
 				interval: 2000,
@@ -199,18 +199,15 @@
 				})
 			},
 			_addPlus: function () {
-				this.showIconFlie = !this.showIconFlie
+				this.showIconFile = !this.showIconFile
+				uni.$emit('showFile', this.showIconFile)
 				// this.scrollToBottom()
 			},
 			_chatMsg:function (msgData) {
 				uni.$emit('getSendData', msgData)
 			},
-			bigView: function () {
-				this.showIconFlie = false
-				
-			},
-			stopBigView: function () {
-				
+			stopBigView: function (e) {
+				console.log(e)
 			},
 			holdToTalk: function () {
 				this.showSendBtn = false
@@ -317,13 +314,13 @@
 </style>
 
 <style lang="scss">
-	
 	.send-main{
 			position: fixed;
 			bottom: 0;
 			width: 100%;
 			min-height: 80rpx;
 			background:rgba(255,255,255, 1);
+			
 			.send-info {
 				display: flex;
 				padding: 16rpx 0;
@@ -436,47 +433,59 @@
 					margin-right: 20rpx;
 					padding: 4rpx  20rpx!important;
 					background-color: #07c160;
+					position: relative;
+					right: -100rpx;
+					animation: showSend 0.3s forwards;
+				}
+				@keyframes showSend {
+				    0% {
+				         right: -100rpx;
+				    }
+				    100% {
+				        right: 0;
+				    }
 				}
 			}
 			.select-main {
 				width: 100%;
-				height: 520rpx;
+				height: 526rpx;
 				background-color: #F7F7F7;
-				swiper {
+				.swiper {
 					height: 480rpx;
 				}
-				swiper-item {
+				.swiper-item {
 					height: 480rpx;
 					display: flex;
-					.add-select-list {
-						float: left;
-						width: 140rpx;
-						height: 200rpx;
-						margin: 0 16rpx;
-						margin-bottom: 10rpx;
-						color: #7b7b7b;
-						.img-bg {
-							width: 60rpx;
-							height: 60rpx;
-							background-color: #FFFFFF;
-							padding: 30rpx;
-							border-radius: 30rpx;
-							margin: 0 auto;
-							image {
-								width: 100%;
-								height: 100%;
-							}
-						}
-						.text {
-							display: block;
-							width: 140rpx;
-							text-align: center;
-							font-size: 24rpx;
-							height: 60rpx;
-							line-height: 60rpx;
-						}
-					}
+					flex-wrap: wrap
 				}
+			}
+		}
+		.add-select-list {
+			float: left;
+			width: 140rpx;
+			height: 200rpx;
+			margin: 0 16rpx;
+			margin-bottom: 10rpx;
+			color: #7b7b7b;
+			.add-imgs {
+				background-color: #FFFFFF;
+				padding: 30rpx;
+				border-radius: 30rpx;
+				margin: 0 auto;
+				.tu {
+					display: block;
+					margin: 0 auto;
+					width: 60rpx;
+					height: 60rpx;
+				}
+			}
+			.text {
+				display: block;
+				width: 140rpx;
+				text-align: center;
+				font-size: 24rpx;
+				height: 60rpx;
+				line-height: 60rpx;
 			}
 		}
 </style>

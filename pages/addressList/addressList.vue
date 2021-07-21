@@ -52,10 +52,6 @@
 		onLoad(option) {
 		},
 		onReady() {
-			uni.setTabBarBadge({
-				index: 1,
-				text: '99+'
-			})
 		},
 		mounted() {
 			let pinyin = require('js-pinyin');

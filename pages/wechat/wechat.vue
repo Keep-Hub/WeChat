@@ -101,7 +101,7 @@
 			    ...mapState(['userInfo','chatList','AllBadge'])
 			},
 			onPullDownRefresh() {
-			        // this.getChatList()
+			        this.getChatList()
 			        setTimeout(function () {
 			            uni.stopPullDownRefresh();
 			        }, 1000);

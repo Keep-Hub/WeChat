@@ -3430,9 +3430,9 @@ var render = function() {
       _c(
         "v-uni-scroll-view",
         {
-          staticStyle: { position: "absolute", "margin-bottom": "100rpx" },
           style: _vm._$g(1, "s"),
           attrs: {
+            "upper-threshold": 50,
             id: "scrollview",
             "scroll-y": "false",
             "scroll-with-animation": _vm._$g(1, "a-scroll-with-animation"),
@@ -3441,6 +3441,9 @@ var render = function() {
             _i: 1
           },
           on: {
+            scrolltoupper: function($event) {
+              return _vm.$handleViewEvent($event)
+            },
             touchstart: function($event) {
               return _vm.$handleViewEvent($event)
             },
@@ -3450,24 +3453,37 @@ var render = function() {
           }
         },
         [
-          _vm._l(_vm._$g(2, "f"), function(item, index, $20, $30) {
+          _vm._$g(2, "i")
+            ? _c(
+                "v-uni-view",
+                { attrs: { _i: 2 } },
+                [
+                  _c("v-uni-image", {
+                    staticClass: _vm._$g(3, "sc"),
+                    attrs: { src: _vm._$g(3, "a-src"), mode: "", _i: 3 }
+                  })
+                ],
+                1
+              )
+            : _vm._e(),
+          _vm._l(_vm._$g(4, "f"), function(item, index, $20, $30) {
             return _c(
               "v-uni-view",
               {
                 key: item,
-                attrs: { id: _vm._$g("2-" + $30, "a-id"), _i: "2-" + $30 }
+                attrs: { id: _vm._$g("4-" + $30, "a-id"), _i: "4-" + $30 }
               },
               [
-                _vm._$g("3-" + $30, "i")
+                _vm._$g("5-" + $30, "i")
                   ? _c(
                       "v-uni-view",
                       {
-                        staticClass: _vm._$g("3-" + $30, "sc"),
-                        attrs: { _i: "3-" + $30 }
+                        staticClass: _vm._$g("5-" + $30, "sc"),
+                        attrs: { _i: "5-" + $30 }
                       },
                       [
-                        _c("v-uni-text", { attrs: { _i: "4-" + $30 } }, [
-                          _vm._v(_vm._$g("4-" + $30, "t0-0"))
+                        _c("v-uni-text", { attrs: { _i: "6-" + $30 } }, [
+                          _vm._v(_vm._$g("6-" + $30, "t0-0"))
                         ])
                       ],
                       1
@@ -3476,23 +3492,23 @@ var render = function() {
                 _c(
                   "v-uni-view",
                   {
-                    staticClass: _vm._$g("5-" + $30, "sc"),
-                    class: _vm._$g("5-" + $30, "c"),
-                    attrs: { _i: "5-" + $30 }
+                    staticClass: _vm._$g("7-" + $30, "sc"),
+                    class: _vm._$g("7-" + $30, "c"),
+                    attrs: { _i: "7-" + $30 }
                   },
                   [
                     _c(
                       "v-uni-view",
                       {
-                        staticClass: _vm._$g("6-" + $30, "sc"),
-                        attrs: { _i: "6-" + $30 }
+                        staticClass: _vm._$g("8-" + $30, "sc"),
+                        attrs: { _i: "8-" + $30 }
                       },
                       [
                         _c("v-uni-image", {
                           attrs: {
-                            src: _vm._$g("7-" + $30, "a-src"),
+                            src: _vm._$g("9-" + $30, "a-src"),
                             mode: "",
-                            _i: "7-" + $30
+                            _i: "9-" + $30
                           },
                           on: {
                             click: function($event) {
@@ -3506,50 +3522,50 @@ var render = function() {
                     _c(
                       "v-uni-view",
                       {
-                        staticClass: _vm._$g("8-" + $30, "sc"),
-                        class: _vm._$g("8-" + $30, "c"),
-                        attrs: { _i: "8-" + $30 }
+                        staticClass: _vm._$g("10-" + $30, "sc"),
+                        class: _vm._$g("10-" + $30, "c"),
+                        attrs: { _i: "10-" + $30 }
                       },
                       [
                         _c(
                           "v-uni-view",
                           {
-                            staticClass: _vm._$g("9-" + $30, "sc"),
-                            class: _vm._$g("9-" + $30, "c"),
-                            attrs: { _i: "9-" + $30 }
+                            staticClass: _vm._$g("11-" + $30, "sc"),
+                            class: _vm._$g("11-" + $30, "c"),
+                            attrs: { _i: "11-" + $30 }
                           },
                           [
                             _c("v-uni-text", {
-                              staticClass: _vm._$g("10-" + $30, "sc"),
-                              class: _vm._$g("10-" + $30, "c"),
-                              attrs: { _i: "10-" + $30 }
+                              staticClass: _vm._$g("12-" + $30, "sc"),
+                              class: _vm._$g("12-" + $30, "c"),
+                              attrs: { _i: "12-" + $30 }
                             }),
                             _c(
                               "v-uni-view",
                               {
-                                staticClass: _vm._$g("11-" + $30, "sc"),
-                                attrs: { _i: "11-" + $30 }
+                                staticClass: _vm._$g("13-" + $30, "sc"),
+                                attrs: { _i: "13-" + $30 }
                               },
                               [
-                                _vm._$g("12-" + $30, "i")
+                                _vm._$g("14-" + $30, "i")
                                   ? _c(
                                       "v-uni-view",
                                       {
-                                        staticClass: _vm._$g("12-" + $30, "sc"),
-                                        attrs: { _i: "12-" + $30 }
+                                        staticClass: _vm._$g("14-" + $30, "sc"),
+                                        attrs: { _i: "14-" + $30 }
                                       },
-                                      [_vm._v(_vm._$g("12-" + $30, "t0-0"))]
+                                      [_vm._v(_vm._$g("14-" + $30, "t0-0"))]
                                     )
-                                  : _vm._$g("13-" + $30, "e")
+                                  : _vm._$g("15-" + $30, "e")
                                   ? _c("v-uni-image", {
                                       ref: "imgSize",
                                       refInFor: true,
-                                      staticClass: _vm._$g("13-" + $30, "sc"),
-                                      class: _vm._$g("13-" + $30, "c"),
+                                      staticClass: _vm._$g("15-" + $30, "sc"),
+                                      class: _vm._$g("15-" + $30, "c"),
                                       attrs: {
-                                        src: _vm._$g("13-" + $30, "a-src"),
-                                        mode: _vm._$g("13-" + $30, "a-mode"),
-                                        _i: "13-" + $30
+                                        src: _vm._$g("15-" + $30, "a-src"),
+                                        mode: _vm._$g("15-" + $30, "a-mode"),
+                                        _i: "15-" + $30
                                       },
                                       on: {
                                         click: function($event) {
@@ -3557,13 +3573,13 @@ var render = function() {
                                         }
                                       }
                                     })
-                                  : _vm._$g("14-" + $30, "e")
+                                  : _vm._$g("16-" + $30, "e")
                                   ? _c(
                                       "v-uni-view",
                                       {
-                                        staticClass: _vm._$g("14-" + $30, "sc"),
-                                        class: _vm._$g("14-" + $30, "c"),
-                                        attrs: { _i: "14-" + $30 },
+                                        staticClass: _vm._$g("16-" + $30, "sc"),
+                                        class: _vm._$g("16-" + $30, "c"),
+                                        attrs: { _i: "16-" + $30 },
                                         on: {
                                           click: function($event) {
                                             return _vm.$handleViewEvent($event)
@@ -3571,26 +3587,26 @@ var render = function() {
                                         }
                                       },
                                       [
-                                        _vm._$g("15-" + $30, "i")
+                                        _vm._$g("17-" + $30, "i")
                                           ? _c(
                                               "v-uni-text",
                                               {
                                                 staticClass: _vm._$g(
-                                                  "15-" + $30,
+                                                  "17-" + $30,
                                                   "sc"
                                                 ),
                                                 staticStyle: {
                                                   "text-align": "right"
                                                 },
                                                 style: _vm._$g(
-                                                  "15-" + $30,
+                                                  "17-" + $30,
                                                   "s"
                                                 ),
-                                                attrs: { _i: "15-" + $30 }
+                                                attrs: { _i: "17-" + $30 }
                                               },
                                               [
                                                 _vm._v(
-                                                  _vm._$g("15-" + $30, "t0-0") +
+                                                  _vm._$g("17-" + $30, "t0-0") +
                                                     "″"
                                                 )
                                               ]
@@ -3600,51 +3616,51 @@ var render = function() {
                                           "v-uni-view",
                                           {
                                             staticClass: _vm._$g(
-                                              "16-" + $30,
+                                              "18-" + $30,
                                               "sc"
                                             ),
-                                            class: _vm._$g("16-" + $30, "c"),
-                                            attrs: { _i: "16-" + $30 }
+                                            class: _vm._$g("18-" + $30, "c"),
+                                            attrs: { _i: "18-" + $30 }
                                           },
                                           [
                                             _c(
                                               "v-uni-view",
                                               {
                                                 staticClass: _vm._$g(
-                                                  "17-" + $30,
+                                                  "19-" + $30,
                                                   "sc"
                                                 ),
-                                                attrs: { _i: "17-" + $30 }
+                                                attrs: { _i: "19-" + $30 }
                                               },
                                               [
                                                 _c("v-uni-view", {
                                                   staticClass: _vm._$g(
-                                                    "18-" + $30,
-                                                    "sc"
-                                                  ),
-                                                  attrs: { _i: "18-" + $30 }
-                                                }),
-                                                _c("v-uni-view", {
-                                                  staticClass: _vm._$g(
-                                                    "19-" + $30,
-                                                    "sc"
-                                                  ),
-                                                  class: _vm._$g(
-                                                    "19-" + $30,
-                                                    "c"
-                                                  ),
-                                                  attrs: { _i: "19-" + $30 }
-                                                }),
-                                                _c("v-uni-view", {
-                                                  staticClass: _vm._$g(
                                                     "20-" + $30,
                                                     "sc"
-                                                  ),
-                                                  class: _vm._$g(
-                                                    "20-" + $30,
-                                                    "c"
                                                   ),
                                                   attrs: { _i: "20-" + $30 }
+                                                }),
+                                                _c("v-uni-view", {
+                                                  staticClass: _vm._$g(
+                                                    "21-" + $30,
+                                                    "sc"
+                                                  ),
+                                                  class: _vm._$g(
+                                                    "21-" + $30,
+                                                    "c"
+                                                  ),
+                                                  attrs: { _i: "21-" + $30 }
+                                                }),
+                                                _c("v-uni-view", {
+                                                  staticClass: _vm._$g(
+                                                    "22-" + $30,
+                                                    "sc"
+                                                  ),
+                                                  class: _vm._$g(
+                                                    "22-" + $30,
+                                                    "c"
+                                                  ),
+                                                  attrs: { _i: "22-" + $30 }
                                                 })
                                               ],
                                               1
@@ -3652,35 +3668,35 @@ var render = function() {
                                           ],
                                           1
                                         ),
-                                        _vm._$g("21-" + $30, "i")
+                                        _vm._$g("23-" + $30, "i")
                                           ? _c(
                                               "v-uni-text",
                                               {
                                                 staticClass: _vm._$g(
-                                                  "21-" + $30,
+                                                  "23-" + $30,
                                                   "sc"
                                                 ),
                                                 style: _vm._$g(
-                                                  "21-" + $30,
+                                                  "23-" + $30,
                                                   "s"
                                                 ),
-                                                attrs: { _i: "21-" + $30 }
+                                                attrs: { _i: "23-" + $30 }
                                               },
                                               [
                                                 _vm._v(
-                                                  _vm._$g("21-" + $30, "t0-0") +
+                                                  _vm._$g("23-" + $30, "t0-0") +
                                                     "″"
                                                 )
                                               ]
                                             )
                                           : _vm._e(),
-                                        _vm._$g("22-" + $30, "i")
+                                        _vm._$g("24-" + $30, "i")
                                           ? _c("v-uni-text", {
                                               staticClass: _vm._$g(
-                                                "22-" + $30,
+                                                "24-" + $30,
                                                 "sc"
                                               ),
-                                              attrs: { _i: "22-" + $30 }
+                                              attrs: { _i: "24-" + $30 }
                                             })
                                           : _vm._e()
                                       ],
@@ -3702,11 +3718,11 @@ var render = function() {
               ],
               1
             )
-          }),
-          _c("send-info", { attrs: { _i: 23 } })
+          })
         ],
         2
-      )
+      ),
+      _c("send-info", { attrs: { _i: 25 } })
     ],
     1
   )
@@ -3839,18 +3855,7 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "v-uni-view",
-    {
-      staticClass: _vm._$g(0, "sc"),
-      attrs: { _i: 0 },
-      on: {
-        touchstart: function($event) {
-          return _vm.$handleViewEvent($event, { stop: true })
-        },
-        click: function($event) {
-          return _vm.$handleViewEvent($event, { stop: true })
-        }
-      }
-    },
+    { staticClass: _vm._$g(0, "sc"), attrs: { _i: 0 } },
     [
       _c(
         "v-uni-view",
@@ -3893,6 +3898,9 @@ var render = function() {
                     return _vm.$handleViewEvent($event)
                   },
                   blur: function($event) {
+                    return _vm.$handleViewEvent($event)
+                  },
+                  click: function($event) {
                     return _vm.$handleViewEvent($event)
                   }
                 },
@@ -3958,12 +3966,7 @@ var render = function() {
               ),
           _c("uni-icons", {
             staticClass: _vm._$g(11, "sc"),
-            attrs: { _i: 11 },
-            on: {
-              click: function($event) {
-                return _vm.$handleViewEvent($event)
-              }
-            }
+            attrs: { _i: 11 }
           }),
           _vm._$g(12, "i")
             ? _c(
@@ -3972,8 +3975,8 @@ var render = function() {
                   staticClass: _vm._$g(12, "sc"),
                   attrs: { size: "small", _i: 12 },
                   on: {
-                    click: function($event) {
-                      return _vm.$handleViewEvent($event)
+                    touchend: function($event) {
+                      return _vm.$handleViewEvent($event, { prevent: true })
                     }
                   }
                 },
@@ -4066,6 +4069,10 @@ var render = function() {
                                             },
                                             [
                                               _c("v-uni-image", {
+                                                staticClass: _vm._$g(
+                                                  "23-" + $30,
+                                                  "sc"
+                                                ),
                                                 attrs: {
                                                   src: _vm._$g(
                                                     "23-" + $30,
@@ -4140,6 +4147,10 @@ var render = function() {
                                             },
                                             [
                                               _c("v-uni-image", {
+                                                staticClass: _vm._$g(
+                                                  "29-" + $31,
+                                                  "sc"
+                                                ),
                                                 attrs: {
                                                   src: _vm._$g(
                                                     "29-" + $31,
@@ -4393,7 +4404,7 @@ if(false) {}
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ./node_modules/css-loader/dist/runtime/api.js */ 19);
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.i, "@charset \"UTF-8\";\r\n/**\r\n * 这里是uni-app内置的常用样式变量\r\n *\r\n * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量\r\n * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App\r\n *\r\n */\r\n/**\r\n * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能\r\n *\r\n * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件\r\n */\r\n/* 颜色变量 */\r\n/* 行为相关颜色 */\r\n/* 文字基本颜色 */\r\n/* 背景颜色 */\r\n/* 边框颜色 */\r\n/* 尺寸变量 */\r\n/* 文字尺寸 */\r\n/* 图片尺寸 */\r\n/* Border Radius */\r\n/* 水平间距 */\r\n/* 垂直间距 */\r\n/* 透明度 */\r\n/* 文章场景相关 */\n.send-main[data-v-5df4e388] {\r\n  position: fixed;\r\n  bottom: 0;\r\n  width: 100%;\r\n  min-height: 80rpx;\r\n  background: white;\n}\n.send-main .send-info[data-v-5df4e388] {\r\n  display: -webkit-box;\r\n  display: -webkit-flex;\r\n  display: flex;\r\n  padding: 16rpx 0;\n}\n.send-main .send-info .chat-send[data-v-5df4e388] {\r\n  -webkit-align-self: center;\r\n          align-self: center;\r\n  -webkit-box-flex: 1;\r\n  -webkit-flex: 1;\r\n          flex: 1;\r\n  min-height: 56rpx;\r\n  max-height: 200rpx;\r\n  background: #f2f2f2;\r\n  -webkit-border-radius: 10rpx;\r\n          border-radius: 10rpx;\r\n  font-size: 30rpx;\r\n  color: #191d23;\r\n  line-height: 52rpx;\r\n  padding: 10rpx 18rpx;\r\n  word-break: break-all;\r\n  word-wrap: break-word;\r\n  position: relative;\n}\n.send-main .send-info .chat-send .cancal-record[data-v-5df4e388] {\r\n  position: fixed;\r\n  bottom: 0;\r\n  left: 0;\r\n  width: 100%;\r\n  height: 100%;\r\n  background-color: rgba(0, 0, 0, 0.5);\r\n  z-index: 99;\n}\n.send-main .send-info .chat-send .cancal-record .move-common[data-v-5df4e388] {\r\n  width: 180rpx;\r\n  height: 180rpx;\r\n  -webkit-border-radius: 50%;\r\n          border-radius: 50%;\r\n  background-color: #CCCCCC;\r\n  position: absolute;\r\n  bottom: 260rpx;\r\n  color: #000000;\r\n  line-height: 180rpx;\r\n  font-size: 36rpx;\r\n  z-index: 999;\r\n  -webkit-transition: 400ms;\r\n  transition: 400ms;\r\n  -webkit-transform: scale(1);\r\n          transform: scale(1);\n}\n.send-main .send-info .chat-send .cancal-record .move-cancal[data-v-5df4e388] {\r\n  left: 80rpx;\n}\n.send-main .send-info .chat-send .cancal-record .move-text[data-v-5df4e388] {\r\n  right: 80rpx;\n}\n.send-main .send-info .chat-send .cancal-record .move-cancal-hover[data-v-5df4e388] {\r\n  background-color: #F56C6C;\r\n  color: #FFFFFF;\r\n  -webkit-transform: scale(1.1);\r\n          transform: scale(1.1);\n}\n.send-main .send-info .chat-send .cancal-record .move-text-hover[data-v-5df4e388] {\r\n  background-color: #07c160;\r\n  color: #FFFFFF;\r\n  -webkit-transform: scale(1.1);\r\n          transform: scale(1.1);\n}\n.send-main .send-info .chat-send .cancal-record .move-bottom[data-v-5df4e388] {\r\n  width: 100%;\r\n  height: 150rpx;\r\n  position: absolute;\r\n  z-index: -1;\r\n  overflow: hidden;\r\n  bottom: 0;\r\n  -webkit-transition: 400ms;\r\n  transition: 400ms;\r\n  -webkit-transform: scale(1);\r\n          transform: scale(1);\n}\n.send-main .send-info .chat-send .cancal-record .move-bottom[data-v-5df4e388]:after {\r\n  content: '';\r\n  width: 110%;\r\n  height: 150rpx;\r\n  position: absolute;\r\n  left: -5%;\r\n  top: 0;\r\n  z-index: -1;\r\n  -webkit-border-radius: 50% 50% 0 0;\r\n          border-radius: 50% 50% 0 0;\r\n  background: #C0C0C0;\n}\n.send-main .send-info .chat-send .cancal-record .move-bottom-hover[data-v-5df4e388] {\r\n  -webkit-transition: 500ms;\r\n  transition: 500ms;\r\n  -webkit-transform: scale(1, 1.3);\r\n          transform: scale(1, 1.3);\n}\n.send-main .send-info .chat-send uni-view[data-v-5df4e388] {\r\n  text-align: center;\r\n  color: #888888;\n}\n.send-main .send-info .recording-a[data-v-5df4e388]:active {\r\n  background-color: #FCF7E9;\n}\n.send-main .send-info .mic-icon[data-v-5df4e388], .send-main .send-info .plus-icon[data-v-5df4e388], .send-main .send-info .smile-icon[data-v-5df4e388] {\r\n  -webkit-align-self: center;\r\n          align-self: center;\r\n  width: 86rpx;\r\n  text-align: center;\n}\n.send-main .send-info .plus-icon[data-v-5df4e388] {\r\n  width: 76rpx;\r\n  text-align: left;\n}\n.send-main .send-info .send-icon[data-v-5df4e388] {\r\n  text-align: center;\r\n  -webkit-align-self: center;\r\n          align-self: center;\r\n  min-height: 46rpx;\r\n  line-height: 46rpx;\r\n  font-size: 30rpx;\r\n  -webkit-border-radius: 6rpx;\r\n          border-radius: 6rpx;\r\n  color: #FFFFFF;\r\n  margin-right: 20rpx;\r\n  padding: 4rpx 20rpx !important;\r\n  background-color: #07c160;\n}\n.send-main .select-main[data-v-5df4e388] {\r\n  width: 100%;\r\n  height: 520rpx;\r\n  background-color: #F7F7F7;\n}\n.send-main .select-main uni-swiper[data-v-5df4e388] {\r\n  height: 480rpx;\n}\n.send-main .select-main uni-swiper-item[data-v-5df4e388] {\r\n  height: 480rpx;\r\n  display: -webkit-box;\r\n  display: -webkit-flex;\r\n  display: flex;\n}\n.send-main .select-main uni-swiper-item .add-select-list[data-v-5df4e388] {\r\n  float: left;\r\n  width: 140rpx;\r\n  height: 200rpx;\r\n  margin: 0 16rpx;\r\n  margin-bottom: 10rpx;\r\n  color: #7b7b7b;\n}\n.send-main .select-main uni-swiper-item .add-select-list .img-bg[data-v-5df4e388] {\r\n  width: 60rpx;\r\n  height: 60rpx;\r\n  background-color: #FFFFFF;\r\n  padding: 30rpx;\r\n  -webkit-border-radius: 30rpx;\r\n          border-radius: 30rpx;\r\n  margin: 0 auto;\n}\n.send-main .select-main uni-swiper-item .add-select-list .img-bg uni-image[data-v-5df4e388] {\r\n  width: 100%;\r\n  height: 100%;\n}\n.send-main .select-main uni-swiper-item .add-select-list .text[data-v-5df4e388] {\r\n  display: block;\r\n  width: 140rpx;\r\n  text-align: center;\r\n  font-size: 24rpx;\r\n  height: 60rpx;\r\n  line-height: 60rpx;\n}\r\n", ""]);
+exports.push([module.i, "@charset \"UTF-8\";\r\n/**\r\n * 这里是uni-app内置的常用样式变量\r\n *\r\n * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量\r\n * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App\r\n *\r\n */\r\n/**\r\n * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能\r\n *\r\n * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件\r\n */\r\n/* 颜色变量 */\r\n/* 行为相关颜色 */\r\n/* 文字基本颜色 */\r\n/* 背景颜色 */\r\n/* 边框颜色 */\r\n/* 尺寸变量 */\r\n/* 文字尺寸 */\r\n/* 图片尺寸 */\r\n/* Border Radius */\r\n/* 水平间距 */\r\n/* 垂直间距 */\r\n/* 透明度 */\r\n/* 文章场景相关 */\n.send-main[data-v-5df4e388] {\r\n  position: fixed;\r\n  bottom: 0;\r\n  width: 100%;\r\n  min-height: 80rpx;\r\n  background: white;\n}\n.send-main .send-info[data-v-5df4e388] {\r\n  display: -webkit-box;\r\n  display: -webkit-flex;\r\n  display: flex;\r\n  padding: 16rpx 0;\n}\n.send-main .send-info .chat-send[data-v-5df4e388] {\r\n  -webkit-align-self: center;\r\n          align-self: center;\r\n  -webkit-box-flex: 1;\r\n  -webkit-flex: 1;\r\n          flex: 1;\r\n  min-height: 56rpx;\r\n  max-height: 200rpx;\r\n  background: #f2f2f2;\r\n  -webkit-border-radius: 10rpx;\r\n          border-radius: 10rpx;\r\n  font-size: 30rpx;\r\n  color: #191d23;\r\n  line-height: 52rpx;\r\n  padding: 10rpx 18rpx;\r\n  word-break: break-all;\r\n  word-wrap: break-word;\r\n  position: relative;\n}\n.send-main .send-info .chat-send .cancal-record[data-v-5df4e388] {\r\n  position: fixed;\r\n  bottom: 0;\r\n  left: 0;\r\n  width: 100%;\r\n  height: 100%;\r\n  background-color: rgba(0, 0, 0, 0.5);\r\n  z-index: 99;\n}\n.send-main .send-info .chat-send .cancal-record .move-common[data-v-5df4e388] {\r\n  width: 180rpx;\r\n  height: 180rpx;\r\n  -webkit-border-radius: 50%;\r\n          border-radius: 50%;\r\n  background-color: #CCCCCC;\r\n  position: absolute;\r\n  bottom: 260rpx;\r\n  color: #000000;\r\n  line-height: 180rpx;\r\n  font-size: 36rpx;\r\n  z-index: 999;\r\n  -webkit-transition: 400ms;\r\n  transition: 400ms;\r\n  -webkit-transform: scale(1);\r\n          transform: scale(1);\n}\n.send-main .send-info .chat-send .cancal-record .move-cancal[data-v-5df4e388] {\r\n  left: 80rpx;\n}\n.send-main .send-info .chat-send .cancal-record .move-text[data-v-5df4e388] {\r\n  right: 80rpx;\n}\n.send-main .send-info .chat-send .cancal-record .move-cancal-hover[data-v-5df4e388] {\r\n  background-color: #F56C6C;\r\n  color: #FFFFFF;\r\n  -webkit-transform: scale(1.1);\r\n          transform: scale(1.1);\n}\n.send-main .send-info .chat-send .cancal-record .move-text-hover[data-v-5df4e388] {\r\n  background-color: #07c160;\r\n  color: #FFFFFF;\r\n  -webkit-transform: scale(1.1);\r\n          transform: scale(1.1);\n}\n.send-main .send-info .chat-send .cancal-record .move-bottom[data-v-5df4e388] {\r\n  width: 100%;\r\n  height: 150rpx;\r\n  position: absolute;\r\n  z-index: -1;\r\n  overflow: hidden;\r\n  bottom: 0;\r\n  -webkit-transition: 400ms;\r\n  transition: 400ms;\r\n  -webkit-transform: scale(1);\r\n          transform: scale(1);\n}\n.send-main .send-info .chat-send .cancal-record .move-bottom[data-v-5df4e388]:after {\r\n  content: '';\r\n  width: 110%;\r\n  height: 150rpx;\r\n  position: absolute;\r\n  left: -5%;\r\n  top: 0;\r\n  z-index: -1;\r\n  -webkit-border-radius: 50% 50% 0 0;\r\n          border-radius: 50% 50% 0 0;\r\n  background: #C0C0C0;\n}\n.send-main .send-info .chat-send .cancal-record .move-bottom-hover[data-v-5df4e388] {\r\n  -webkit-transition: 500ms;\r\n  transition: 500ms;\r\n  -webkit-transform: scale(1, 1.3);\r\n          transform: scale(1, 1.3);\n}\n.send-main .send-info .chat-send uni-view[data-v-5df4e388] {\r\n  text-align: center;\r\n  color: #888888;\n}\n.send-main .send-info .recording-a[data-v-5df4e388]:active {\r\n  background-color: #FCF7E9;\n}\n.send-main .send-info .mic-icon[data-v-5df4e388], .send-main .send-info .plus-icon[data-v-5df4e388], .send-main .send-info .smile-icon[data-v-5df4e388] {\r\n  -webkit-align-self: center;\r\n          align-self: center;\r\n  width: 86rpx;\r\n  text-align: center;\n}\n.send-main .send-info .plus-icon[data-v-5df4e388] {\r\n  width: 76rpx;\r\n  text-align: left;\n}\n.send-main .send-info .send-icon[data-v-5df4e388] {\r\n  text-align: center;\r\n  -webkit-align-self: center;\r\n          align-self: center;\r\n  min-height: 46rpx;\r\n  line-height: 46rpx;\r\n  font-size: 30rpx;\r\n  -webkit-border-radius: 6rpx;\r\n          border-radius: 6rpx;\r\n  color: #FFFFFF;\r\n  margin-right: 20rpx;\r\n  padding: 4rpx 20rpx !important;\r\n  background-color: #07c160;\r\n  position: relative;\r\n  right: -100rpx;\r\n  -webkit-animation: showSend-data-v-5df4e388 0.3s forwards;\r\n          animation: showSend-data-v-5df4e388 0.3s forwards;\n}\n@-webkit-keyframes showSend-data-v-5df4e388 {\n0% {\r\n    right: -100rpx;\n}\n100% {\r\n    right: 0;\n}\n}\n@keyframes showSend-data-v-5df4e388 {\n0% {\r\n    right: -100rpx;\n}\n100% {\r\n    right: 0;\n}\n}\n.send-main .select-main[data-v-5df4e388] {\r\n  width: 100%;\r\n  height: 526rpx;\r\n  background-color: #F7F7F7;\n}\n.send-main .select-main .swiper[data-v-5df4e388] {\r\n  height: 480rpx;\n}\n.send-main .select-main .swiper-item[data-v-5df4e388] {\r\n  height: 480rpx;\r\n  display: -webkit-box;\r\n  display: -webkit-flex;\r\n  display: flex;\r\n  -webkit-flex-wrap: wrap;\r\n          flex-wrap: wrap;\n}\n.add-select-list[data-v-5df4e388] {\r\n  float: left;\r\n  width: 140rpx;\r\n  height: 200rpx;\r\n  margin: 0 16rpx;\r\n  margin-bottom: 10rpx;\r\n  color: #7b7b7b;\n}\n.add-select-list .add-imgs[data-v-5df4e388] {\r\n  background-color: #FFFFFF;\r\n  padding: 30rpx;\r\n  -webkit-border-radius: 30rpx;\r\n          border-radius: 30rpx;\r\n  margin: 0 auto;\n}\n.add-select-list .add-imgs .tu[data-v-5df4e388] {\r\n  display: block;\r\n  margin: 0 auto;\r\n  width: 60rpx;\r\n  height: 60rpx;\n}\n.add-select-list .text[data-v-5df4e388] {\r\n  display: block;\r\n  width: 140rpx;\r\n  text-align: center;\r\n  font-size: 24rpx;\r\n  height: 60rpx;\r\n  line-height: 60rpx;\n}\r\n", ""]);
 // Exports
 module.exports = exports;
 
@@ -4500,7 +4511,7 @@ if(false) {}
 var ___CSS_LOADER_API_IMPORT___ = __webpack_require__(/*! ./node_modules/css-loader/dist/runtime/api.js */ 19);
 exports = ___CSS_LOADER_API_IMPORT___(false);
 // Module
-exports.push([module.i, "@charset \"UTF-8\";\r\n/**\r\n * 这里是uni-app内置的常用样式变量\r\n *\r\n * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量\r\n * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App\r\n *\r\n */\r\n/**\r\n * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能\r\n *\r\n * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件\r\n */\r\n/* 颜色变量 */\r\n/* 行为相关颜色 */\r\n/* 文字基本颜色 */\r\n/* 背景颜色 */\r\n/* 边框颜色 */\r\n/* 尺寸变量 */\r\n/* 文字尺寸 */\r\n/* 图片尺寸 */\r\n/* Border Radius */\r\n/* 水平间距 */\r\n/* 垂直间距 */\r\n/* 透明度 */\r\n/* 文章场景相关 */\nbody {\r\n  background-color: #ededed;\n}\n.flex-direction {\r\n  -webkit-box-orient: horizontal;\r\n  -webkit-box-direction: reverse;\r\n  -webkit-flex-direction: row-reverse;\r\n          flex-direction: row-reverse;\n}\n.bg-color-b {\r\n  background-color: #FFFFFF;\n}\n.bg-color-g {\r\n  background-color: #95ec69;\n}\n.send-time {\r\n  margin: 30rpx auto;\r\n  color: #888888;\r\n  font-size: 24rpx;\r\n  text-align: center;\n}\n.send-time uni-text {\r\n  background-color: #F8F8F8;\r\n  padding: 4rpx 10rpx;\r\n  -webkit-border-radius: 6rpx;\r\n          border-radius: 6rpx;\n}\n.chat-list {\r\n  display: -webkit-box;\r\n  display: -webkit-flex;\r\n  display: flex;\r\n  -webkit-flex-wrap: nowrap;\r\n          flex-wrap: nowrap;\r\n  padding: 0 20rpx;\r\n  margin-bottom: 20rpx;\n}\n.chat-list .left {\r\n  -webkit-box-flex: 0;\r\n  -webkit-flex: 0 0 76rpx;\r\n          flex: 0 0 76rpx;\n}\n.chat-list .left uni-image {\r\n  width: 76rpx;\r\n  height: 76rpx;\r\n  -webkit-border-radius: 10rpx;\r\n          border-radius: 10rpx;\n}\n.chat-list .left-row {\r\n  margin-left: 26rpx;\r\n  margin-right: 100rpx;\n}\n.chat-list .right-row {\r\n  margin-right: 26rpx;\r\n  margin-left: 100rpx;\n}\n.chat-list .right {\r\n  text-align: justify;\r\n  text-justify: newspaper;\r\n  word-break: break-all;\n}\n.chat-list .right .chat-bubble {\r\n  width: 100%;\r\n  min-height: 76rpx;\r\n  position: relative;\r\n  -webkit-border-radius: 10rpx;\r\n          border-radius: 10rpx;\r\n  display: -webkit-box;\r\n  display: -webkit-flex;\r\n  display: flex;\n}\n.chat-list .right .chat-bubble .square {\r\n  display: block;\r\n  position: absolute;\r\n  top: 24rpx;\n}\n.chat-list .right .chat-bubble .left {\r\n  border-style: solid dashed dashed;\r\n  border-width: 16rpx;\r\n  left: -26rpx;\r\n  border-color: transparent  #FFFFFF transparent transparent;\n}\n.chat-list .right .chat-bubble .right {\r\n  border-style: solid dashed dashed;\r\n  border-width: 16rpx;\r\n  right: -26rpx;\r\n  border-color: transparent  transparent transparent #95ec69;\n}\n.chat-list .right .chat-bubble .msg-info {\r\n  width: 100%;\r\n  line-height: 48rpx;\r\n  -webkit-align-self: center;\r\n          align-self: center;\r\n  font-size: 32rpx;\n}\n.chat-list .right .chat-bubble .msg-info .msg-text {\r\n  padding: 14rpx 20rpx;\n}\n.chat-list .right .chat-bubble .msg-info uni-image {\r\n  -webkit-border-radius: 10rpx;\r\n          border-radius: 10rpx;\r\n  background-color: #FFFFFF;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg {\r\n  position: relative;\r\n  padding: 0 20rpx;\r\n  display: -webkit-box;\r\n  display: -webkit-flex;\r\n  display: flex;\r\n  -webkit-border-radius: 10rpx;\r\n          border-radius: 10rpx;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box {\r\n  width: 50rpx;\r\n  height: 60rpx;\r\n  -webkit-box-sizing: border-box;\r\n          box-sizing: border-box;\r\n  position: relative;\r\n  margin: 8rpx auto;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .voice-symbol {\r\n  width: 50rpx;\r\n  height: 50rpx;\r\n  -webkit-box-sizing: border-box;\r\n          box-sizing: border-box;\r\n  position: relative;\r\n  /*必须，否则苹果overflow失效*/\r\n  top: 5rpx;\r\n  left: 20rpx;\r\n  overflow: hidden;\r\n  -webkit-transform: rotate(135deg);\r\n          transform: rotate(135deg);\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .voice-circle {\r\n  border: 4rpx solid #000000;\r\n  -webkit-border-radius: 50%;\r\n          border-radius: 50%;\r\n  position: absolute;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .first {\r\n  width: 6rpx;\r\n  height: 6rpx;\r\n  background: #000000;\r\n  top: 45rpx;\r\n  left: 45rpx;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .second {\r\n  width: 25rpx;\r\n  height: 25rpx;\r\n  top: 35rpx;\r\n  left: 35rpx;\r\n  -webkit-animation: fadeInOut1 1s infinite 0.5s;\r\n          animation: fadeInOut1 1s infinite 0.5s;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .third {\r\n  width: 40rpx;\r\n  height: 40rpx;\r\n  top: 25rpx;\r\n  left: 25rpx;\r\n  -webkit-animation: fadeInOut1 1s infinite 0.5s;\r\n          animation: fadeInOut1 1s infinite 0.5s;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .second-animation {\r\n  -webkit-animation: fadeInOut 1s infinite 0.5s;\r\n          animation: fadeInOut 1s infinite 0.5s;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .third-animation {\r\n  -webkit-animation: fadeInOut 1s infinite 0.6s;\r\n          animation: fadeInOut 1s infinite 0.6s;\n}\n@-webkit-keyframes fadeInOut {\n0% {\r\n    opacity: 0;\r\n    /*初始状态 透明度为0*/\n}\n100% {\r\n    opacity: 1;\r\n    /*结尾状态 透明度为1*/\n}\n}\n@keyframes fadeInOut {\n0% {\r\n    opacity: 0;\r\n    /*初始状态 透明度为0*/\n}\n100% {\r\n    opacity: 1;\r\n    /*结尾状态 透明度为1*/\n}\n}\n@-webkit-keyframes fadeInOut1 {\n0% {\r\n    opacity: 1;\r\n    /*初始状态 透明度为1*/\n}\n100% {\r\n    opacity: 1;\r\n    /*结尾状态 透明度为1*/\n}\n}\n@keyframes fadeInOut1 {\n0% {\r\n    opacity: 1;\r\n    /*初始状态 透明度为1*/\n}\n100% {\r\n    opacity: 1;\r\n    /*结尾状态 透明度为1*/\n}\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .f-r {\r\n  -webkit-transform: rotate(180deg) !important;\r\n          transform: rotate(180deg) !important;\r\n  /* left: -10rpx!important; */\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-time {\r\n  min-width: 50rpx;\r\n  max-width: 260rpx;\r\n  height: 76rpx;\r\n  line-height: 76rpx;\r\n  font-size: 26rpx;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-red-hot {\r\n  width: 20rpx;\r\n  height: 20rpx;\r\n  background-color: red;\r\n  position: absolute;\r\n  right: -40rpx;\r\n  -webkit-border-radius: 50%;\r\n          border-radius: 50%;\r\n  top: 28rpx;\n}\n.chat-list .right .chat-bubble .msg-info .max {\r\n  max-width: 400rpx;\r\n  max-height: 320rpx;\n}\n.chat-list .right .chat-bubble .msg-info .small {\r\n  max-height: 160rpx;\n}\n.chat-list .right .chat-bubble .msg-info .min {\r\n  max-height: 80rpx;\n}\r\n", ""]);
+exports.push([module.i, "@charset \"UTF-8\";\r\n/**\r\n * 这里是uni-app内置的常用样式变量\r\n *\r\n * uni-app 官方扩展插件及插件市场（https://ext.dcloud.net.cn）上很多三方插件均使用了这些样式变量\r\n * 如果你是插件开发者，建议你使用scss预处理，并在插件代码中直接使用这些变量（无需 import 这个文件），方便用户通过搭积木的方式开发整体风格一致的App\r\n *\r\n */\r\n/**\r\n * 如果你是App开发者（插件使用者），你可以通过修改这些变量来定制自己的插件主题，实现自定义主题功能\r\n *\r\n * 如果你的项目同样使用了scss预处理，你也可以直接在你的 scss 代码中使用如下变量，同时无需 import 这个文件\r\n */\r\n/* 颜色变量 */\r\n/* 行为相关颜色 */\r\n/* 文字基本颜色 */\r\n/* 背景颜色 */\r\n/* 边框颜色 */\r\n/* 尺寸变量 */\r\n/* 文字尺寸 */\r\n/* 图片尺寸 */\r\n/* Border Radius */\r\n/* 水平间距 */\r\n/* 垂直间距 */\r\n/* 透明度 */\r\n/* 文章场景相关 */\nbody {\r\n  background-color: #ededed;\n}\n.flex-direction {\r\n  -webkit-box-orient: horizontal;\r\n  -webkit-box-direction: reverse;\r\n  -webkit-flex-direction: row-reverse;\r\n          flex-direction: row-reverse;\n}\n.bg-color-b {\r\n  background-color: #FFFFFF;\n}\n.bg-color-g {\r\n  background-color: #95ec69;\n}\n.send-time {\r\n  margin: 30rpx auto;\r\n  color: #888888;\r\n  font-size: 24rpx;\r\n  text-align: center;\n}\n.send-time uni-text {\r\n  background-color: #F8F8F8;\r\n  padding: 4rpx 10rpx;\r\n  -webkit-border-radius: 6rpx;\r\n          border-radius: 6rpx;\n}\n.loading-img {\r\n  width: 50rpx;\r\n  height: 50rpx;\r\n  margin: 0 auto;\r\n  padding: 30rpx 0;\r\n  display: block;\r\n  -webkit-animation: movea 1s linear infinite;\r\n          animation: movea 1s linear infinite;\n}\n@-webkit-keyframes movea {\nfrom {\r\n    -webkit-transform: rotate(0deg);\r\n            transform: rotate(0deg);\n}\nto {\r\n    -webkit-transform: rotate(360deg);\r\n            transform: rotate(360deg);\n}\n}\n@keyframes movea {\nfrom {\r\n    -webkit-transform: rotate(0deg);\r\n            transform: rotate(0deg);\n}\nto {\r\n    -webkit-transform: rotate(360deg);\r\n            transform: rotate(360deg);\n}\n}\n.chat-list {\r\n  display: -webkit-box;\r\n  display: -webkit-flex;\r\n  display: flex;\r\n  -webkit-flex-wrap: nowrap;\r\n          flex-wrap: nowrap;\r\n  padding: 0 20rpx;\r\n  margin-bottom: 20rpx;\n}\n.chat-list .left {\r\n  -webkit-box-flex: 0;\r\n  -webkit-flex: 0 0 76rpx;\r\n          flex: 0 0 76rpx;\n}\n.chat-list .left uni-image {\r\n  width: 76rpx;\r\n  height: 76rpx;\r\n  -webkit-border-radius: 10rpx;\r\n          border-radius: 10rpx;\n}\n.chat-list .left-row {\r\n  margin-left: 26rpx;\r\n  margin-right: 100rpx;\n}\n.chat-list .right-row {\r\n  margin-right: 26rpx;\r\n  margin-left: 100rpx;\n}\n.chat-list .right {\r\n  text-align: justify;\r\n  text-justify: newspaper;\r\n  word-break: break-all;\n}\n.chat-list .right .chat-bubble {\r\n  width: 100%;\r\n  min-height: 76rpx;\r\n  position: relative;\r\n  -webkit-border-radius: 10rpx;\r\n          border-radius: 10rpx;\r\n  display: -webkit-box;\r\n  display: -webkit-flex;\r\n  display: flex;\n}\n.chat-list .right .chat-bubble .square {\r\n  display: block;\r\n  position: absolute;\r\n  top: 24rpx;\n}\n.chat-list .right .chat-bubble .left {\r\n  border-style: solid dashed dashed;\r\n  border-width: 16rpx;\r\n  left: -26rpx;\r\n  border-color: transparent  #FFFFFF transparent transparent;\n}\n.chat-list .right .chat-bubble .right {\r\n  border-style: solid dashed dashed;\r\n  border-width: 16rpx;\r\n  right: -26rpx;\r\n  border-color: transparent  transparent transparent #95ec69;\n}\n.chat-list .right .chat-bubble .msg-info {\r\n  width: 100%;\r\n  line-height: 48rpx;\r\n  -webkit-align-self: center;\r\n          align-self: center;\r\n  font-size: 32rpx;\n}\n.chat-list .right .chat-bubble .msg-info .msg-text {\r\n  padding: 14rpx 20rpx;\n}\n.chat-list .right .chat-bubble .msg-info uni-image {\r\n  -webkit-border-radius: 10rpx;\r\n          border-radius: 10rpx;\r\n  background-color: #FFFFFF;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg {\r\n  position: relative;\r\n  padding: 0 20rpx;\r\n  display: -webkit-box;\r\n  display: -webkit-flex;\r\n  display: flex;\r\n  -webkit-border-radius: 10rpx;\r\n          border-radius: 10rpx;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box {\r\n  width: 50rpx;\r\n  height: 60rpx;\r\n  -webkit-box-sizing: border-box;\r\n          box-sizing: border-box;\r\n  position: relative;\r\n  margin: 8rpx auto;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .voice-symbol {\r\n  width: 50rpx;\r\n  height: 50rpx;\r\n  -webkit-box-sizing: border-box;\r\n          box-sizing: border-box;\r\n  position: relative;\r\n  /*必须，否则苹果overflow失效*/\r\n  top: 5rpx;\r\n  left: 20rpx;\r\n  overflow: hidden;\r\n  -webkit-transform: rotate(135deg);\r\n          transform: rotate(135deg);\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .voice-circle {\r\n  border: 4rpx solid #000000;\r\n  -webkit-border-radius: 50%;\r\n          border-radius: 50%;\r\n  position: absolute;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .first {\r\n  width: 6rpx;\r\n  height: 6rpx;\r\n  background: #000000;\r\n  top: 45rpx;\r\n  left: 45rpx;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .second {\r\n  width: 25rpx;\r\n  height: 25rpx;\r\n  top: 35rpx;\r\n  left: 35rpx;\r\n  -webkit-animation: fadeInOut1 1s infinite 0.5s;\r\n          animation: fadeInOut1 1s infinite 0.5s;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .third {\r\n  width: 40rpx;\r\n  height: 40rpx;\r\n  top: 25rpx;\r\n  left: 25rpx;\r\n  -webkit-animation: fadeInOut1 1s infinite 0.5s;\r\n          animation: fadeInOut1 1s infinite 0.5s;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .second-animation {\r\n  -webkit-animation: fadeInOut 1s infinite 0.5s;\r\n          animation: fadeInOut 1s infinite 0.5s;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-box .third-animation {\r\n  -webkit-animation: fadeInOut 1s infinite 0.6s;\r\n          animation: fadeInOut 1s infinite 0.6s;\n}\n@-webkit-keyframes fadeInOut {\n0% {\r\n    opacity: 0;\r\n    /*初始状态 透明度为0*/\n}\n100% {\r\n    opacity: 1;\r\n    /*结尾状态 透明度为1*/\n}\n}\n@keyframes fadeInOut {\n0% {\r\n    opacity: 0;\r\n    /*初始状态 透明度为0*/\n}\n100% {\r\n    opacity: 1;\r\n    /*结尾状态 透明度为1*/\n}\n}\n@-webkit-keyframes fadeInOut1 {\n0% {\r\n    opacity: 1;\r\n    /*初始状态 透明度为1*/\n}\n100% {\r\n    opacity: 1;\r\n    /*结尾状态 透明度为1*/\n}\n}\n@keyframes fadeInOut1 {\n0% {\r\n    opacity: 1;\r\n    /*初始状态 透明度为1*/\n}\n100% {\r\n    opacity: 1;\r\n    /*结尾状态 透明度为1*/\n}\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .f-r {\r\n  -webkit-transform: rotate(180deg) !important;\r\n          transform: rotate(180deg) !important;\r\n  /* left: -10rpx!important; */\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-time {\r\n  min-width: 50rpx;\r\n  max-width: 260rpx;\r\n  height: 76rpx;\r\n  line-height: 76rpx;\r\n  font-size: 26rpx;\n}\n.chat-list .right .chat-bubble .msg-info .recorder-msg .voice-red-hot {\r\n  width: 20rpx;\r\n  height: 20rpx;\r\n  background-color: red;\r\n  position: absolute;\r\n  right: -40rpx;\r\n  -webkit-border-radius: 50%;\r\n          border-radius: 50%;\r\n  top: 28rpx;\n}\n.chat-list .right .chat-bubble .msg-info .max {\r\n  max-width: 400rpx;\r\n  max-height: 320rpx;\n}\n.chat-list .right .chat-bubble .msg-info .small {\r\n  max-height: 160rpx;\n}\n.chat-list .right .chat-bubble .msg-info .min {\r\n  max-height: 80rpx;\n}\r\n", ""]);
 // Exports
 module.exports = exports;
 
