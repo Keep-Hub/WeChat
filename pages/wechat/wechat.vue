@@ -95,7 +95,7 @@
 			onShow () {
 				uni.$emit('setTabBarItem')
 				uni.$on('setWeChatTitleBadge', res => {
-					this.$forceUpdate()
+					// this.$forceUpdate()
 					let pages = getCurrentPages(); //当前页
 					if (pages[pages.length - 1].route === 'pages/wechat/wechat') {
 						uni.setNavigationBarTitle({
@@ -133,7 +133,7 @@
 								res.data.forEach(i => {
 									i.hot = 0
 								})
-								uni.setStorage({key: this.userInfo._id + '_' + item.id, data: res.data})
+								uni.setStorageSync(this.userInfo._id + '_' + item.id, res.data)
 								uni.$emit('setTabBarItem')
 							}
 						})

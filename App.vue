@@ -76,8 +76,8 @@
 		methods: {  
 		    ...mapActions(['getLoginToken', 'getChatList', 'getUserInfo', 'getAllBadge']),
 			getBadge: function (data) {
+				uni.$emit('setWeChatTitleBadge', data.unreadMsg)
 				if (data.unreadMsg > 0) {
-					uni.$emit('setWeChatTitleBadge', data.unreadMsg)
 					uni.setTabBarBadge({
 						index: 0,
 						text: data.unreadMsg >= 99 ? '99+' : data.unreadMsg.toString()
