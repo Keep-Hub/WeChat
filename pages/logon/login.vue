@@ -60,6 +60,17 @@ export default {
 	},
 	onReady() {
 	},
+	onShow() {
+		uni.getStorage({
+			key: 'userInfo',
+			success:(res) => {
+				this.email = res.data.mail
+				console.log(res.data.mail)
+			},
+			fail: (res) => {
+			}
+		});
+	},
 	mounted() {
 	},
 	methods: {
@@ -120,10 +131,11 @@ export default {
 					this.token = data.token
 					// uni.setStorageSync('token', data.token)
 					this.getLoginToken(data)
-					this.socket.emit('setRoom',{"_id": data.result[0]._id})
-					uni.switchTab({
-					    url: '../wechat/wechat'
-					});
+					setTimeout(() => {
+						uni.switchTab({
+							url: '../wechat/wechat'
+						});
+					}, 800)
 				}
 				this.$refs.uToast.show({
 						title: data.message,

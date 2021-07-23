@@ -86,6 +86,16 @@
 		methods: {
 			...mapActions(['quitLogin']),
 			_quitLogin: function() {
+				uni.$emit('setTabBarItem')
+				uni.getStorage({
+					key: 'userInfo',
+					success: (res) => {
+						this.socket.emit('leaveRoom',{"_id": res.data._id})
+					},
+					fail: (err) => {
+						console.log('无用户信息')
+					}
+				})
 				this.quitLogin()
 				uni.reLaunch({
 						url: '../../logon/login'
@@ -180,7 +190,7 @@ page {
 			position: relative;
 		}
 		.right {
-			width: 100%;	
+			width: 100%;
 			display: flex;
 			flex-wrap: nowrap;
 			border-bottom: 1rpx solid #f4f4f4;

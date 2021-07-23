@@ -88,51 +88,36 @@
 					this.isSupport = !this.isSupport;
 				}
 				uni.startPullDownRefresh();
+				this.init()
 		    },
 			watch: {
 			},
 			onShow () {
-				this.getChatList()
-				uni.setNavigationBarTitle({
-				　　title: this.AllBadge.unreadMsg > 0 ? '微信(' + (this.AllBadge.unreadMsg >= 99? '99+' : this.AllBadge.unreadMsg) + ')' : '微信'
+				uni.$emit('setTabBarItem')
+				uni.$on('setWeChatTitleBadge', res => {
+					this.$forceUpdate()
+					let pages = getCurrentPages(); //当前页
+					if (pages[pages.length - 1].route === 'pages/wechat/wechat') {
+						uni.setNavigationBarTitle({
+						　　title: this.AllBadge.unreadMsg > 0 ? '微信(' + (this.AllBadge.unreadMsg >= 99? '99+' : this.AllBadge.unreadMsg) + ')' : '微信'
+						})
+					}
 				})
 			},
 			computed: {
 			    ...mapState(['userInfo','chatList','AllBadge'])
 			},
 			onPullDownRefresh() {
-			        this.getChatList()
+			       uni.$emit('setTabBarItem')
 			        setTimeout(function () {
 			            uni.stopPullDownRefresh();
 			        }, 1000);
 			},
 			mounted(){
-				this.init()
-				uni.$on('updataChatList', (data) => {
-					this.getChatList()
-				})
 			},
 		    methods: {
 				...mapActions(['getChatList']),
 				init: function() {
-					this.socket.on('getMassage', data => {
-						let chatData = []
-						uni.getStorage({
-							key: this.userInfo._id + '_' + data.userId,
-							success: (res) => {
-								chatData = res.data;
-								chatData.push(data)
-								uni.setStorageSync(this.userInfo._id + '_' + data.userId, chatData)
-							},
-							fail: (err) => {
-								chatData.push(data)
-								uni.setStorage({key: this.userInfo._id + '_' + data.userId,data: chatData})
-							}
-						})
-						this.$nextTick(function(){
-							this.updataMsg(data.userId, data)
-						})
-					})
 				},
 				swipeChange(e,index){
 				  // console.log('当前状态：'+ open +'，下标：' + index)
@@ -149,7 +134,6 @@
 									i.hot = 0
 								})
 								uni.setStorage({key: this.userInfo._id + '_' + item.id, data: res.data})
-								this.getChatList()
 								uni.$emit('setTabBarItem')
 							}
 						})
@@ -198,80 +182,7 @@
 					this.btnShow = "不显示"
 					this.btnDelete = "删除"
 				},
-				updataMsg: function (id, data) {
-					uni.getStorage({
-						key: this.userInfo._id + 'chatList',
-						success: (res) => {
-							let findId = res.data.findIndex(item => item.id === id)
-							if (findId === -1) {
-								userInfoApi.getVerifyBuddy({_id: this.userInfo._id, sendId: data.userId}).then(res => {
-									const row = res.result[0]
-									let n = {
-											id: row.buddyId,
-											img: row.img,
-											name: row.nickName,
-											new: data.msg,
-											time: data.time,
-											hot: data.hot,
-											remind: false,
-											swipe: row.swipe,
-											showSwipe: row.showSwipe,
-											clickBtnFlag: false,
-											clearTime: null
-										}
-									this.chatList.push(n)
-									uni.setStorage({
-										key: this.userInfo._id + 'chatList',
-										data: this.chatList
-									})
-								})
-							} else {
-								res.data.forEach(item => {
-									if (item.id === id) {
-										item.new = data.msg
-										item.time = data.time
-									}
-								})
-								uni.setStorageSync(this.userInfo._id + 'chatList', res.data);
-							}
-							this.getChatList()
-							uni.$emit('setTabBarItem')
-							this.$nextTick(function(){
-								let pages = getCurrentPages(); //当前页
-								if (pages[pages.length - 1].route === 'pages/wechat/wechat') {
-									uni.setNavigationBarTitle({
-									　　title: this.AllBadge.unreadMsg > 0 ? '微信(' + (this.AllBadge.unreadMsg >= 99? '99+' : this.AllBadge.unreadMsg) + ')' : '微信'
-									})
-								}
-							})
-						},
-						fail: (err) => {
-							userInfoApi.getVerifyBuddy({_id: this.userInfo._id, sendId: data.userId}).then(res => {
-								const row = res.result[0]
-								let n = {
-										id: row.buddyId,
-										img: row.img,
-										name: row.nickName,
-										new: data.msg,
-										time: data.time,
-										hot: data.hot,
-										remind: false,
-										swipe: row.swipe,
-										showSwipe: row.showSwipe,
-										clickBtnFlag: false,
-										clearTime: null
-									}
-								this.chatList.push(n)
-								uni.setStorage({
-									key: this.userInfo._id + 'chatList',
-									data: this.chatList
-								})
-								this.getChatList()
-								uni.$emit('setTabBarItem')
-							})
-						}
-					})
-				},
+
 				getNowTime: function (value, format) {// value - 标准时间 format: 0-日期+时间 1-时分 2-星期 3-日期
 					let date = new Date(value)
 					let week = date.getDay();
@@ -312,6 +223,7 @@
 				},
 		    },
 			onUnload:function () {
+				// uni.$off('toJoinSocket')
 			}
 	}
 </script>

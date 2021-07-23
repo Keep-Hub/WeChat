@@ -106,6 +106,7 @@
 		},
 		onLoad(option) {
 			this.sendUserInfo = JSON.parse(decodeURIComponent(option.item));
+			this.init()
 			// var animation = uni.createAnimation({
 			//       duration: 1,
 			//       timingFunction: 'step-start',
@@ -120,7 +121,6 @@
 		},
 		onShow () {
 			this.getMsgFalg = true
-			this.init()
 		},
 		computed: {
 		    ...mapState(['chatList', 'userInfo'])
@@ -146,18 +146,23 @@
 				this.chatScreen = 0
 			}
 			this._getMsg()
+			// uni.$on('updataChatRoomMsg', res => {
+			// 	uni.$emit('setTabBarItem')
+			// 	this.$nextTick(function(){
+			// 		this.scrollToView = 'msg' + (this.chatData.length - 1)
+			// 	})
+			// })
 			uni.$on('getSendData', (data) => {
 				this.socket.emit('massage', data)
 				this.chatData.push(data)
 				uni.setStorage({key: data.userId + '_' + data.sendId, data: this.chatData})
-				this.updataMsg(data.sendId, data)
+				uni.$emit('updataMsg', data)
 				this.$nextTick(function(){
 					this.scrollToView = 'msg' + (this.chatData.length - 1)
 				})
 			})
 			uni.$on('showFile', (data) => {
 				this.scrollPadding = data
-				this.$forceUpdate()
 				console.log(data)
 			})
 			// this.timeConversion()
@@ -181,7 +186,7 @@
 				}
 			},
 			getPages: function (page) {
-				return this.getPageData(page, 18, this.allChatData)
+				return this.getPageData(page, 15, this.allChatData)
 			},
 			getPageData: function (currentPage, pageSize, objData) {
 			      let totalPage = Math.ceil(objData.length / pageSize) // 先算出一共多少页
@@ -272,7 +277,7 @@
 						data.hot = 0
 						this.chatData.push(data)
 						uni.setStorage({key: data.sendId + '_' + data.userId,data: this.chatData})
-						this.getChatList()
+						uni.$emit('setTabBarItem')
 						this.$nextTick(function(){
 							this.scrollToView = 'msg' + (this.chatData.length - 1)
 						})
@@ -312,76 +317,6 @@
 			},
 			onBlur: function () {
 				this.showFocus = false
-			},
-			updataMsg: function (id, data) {
-				let chatList = []
-				uni.getStorage({
-					key: this.userInfo._id + 'chatList',
-					success: (res) => {
-						chatList = res.data
-						chatList.forEach(item => {
-							if (id === item.id) {
-								item.new = data.msg
-								item.time = data.time
-								uni.setStorage({
-									key: this.userInfo._id + 'chatList',
-									data: chatList
-								})
-								uni.$emit('updataChatList', item)
-							} else {
-								let isIn = chatList.findIndex(item => item.id === id)
-								if (isIn == -1) {
-									userInfoApi.getVerifyBuddy({_id: this.userInfo._id, sendId: data.sendId}).then(res => {
-										const row = res.result[0]
-										let n = {
-												id: row.buddyId,
-												img: row.img,
-												name: row.nickName,
-												new: data.msg,
-												time: data.time,
-												hot: data.hot,
-												remind: false,
-												swipe: row.swipe,
-												showSwipe: row.showSwipe,
-												clickBtnFlag: false,
-												clearTime: null
-											}
-										chatList.push(n)
-										uni.setStorage({
-											key: this.userInfo._id + 'chatList',
-											data: chatList
-										})
-										uni.$emit('updataChatList', n)
-									})
-								}
-							}
-						})
-					},
-					fail: (err) => {
-						userInfoApi.getVerifyBuddy({_id: this.userInfo._id, sendId: data.sendId}).then(res => {
-							const row = res.result[0]
-							let n = {
-									id: row.buddyId,
-									img: row.img,
-									name: row.nickName,
-									new: data.msg,
-									time: data.time,
-									hot: data.hot,
-									remind: false,
-									swipe: row.swipe,
-									showSwipe: row.showSwipe,
-									clickBtnFlag: false,
-									clearTime: null
-								}
-							chatList.push(n)
-							uni.setStorage({
-								key: this.userInfo._id + 'chatList',
-								data: chatList
-							})
-							uni.$emit('updataChatList', n)
-						})
-					}
-				})
 			},
 			onChange: function(e) {
 				console.log(e.detail)
@@ -462,10 +397,7 @@
 		},
 		onUnload:function () {
 			this.getMsgFalg = false
-			uni.$off('updataChatList')
 			uni.$off('getSendData')
-			this.getChatList()
-			uni.$emit('setTabBarItem')
 		}
 	}
 </script>
@@ -488,7 +420,8 @@
 		background-color: #95ec69
 	}
 	.send-time {
-		margin: 30rpx auto;
+		margin: 0 auto;
+		padding: 30rpx 0;
 		color: #888888;
 		font-size: 24rpx;
 		text-align: center;

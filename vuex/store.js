@@ -4,7 +4,7 @@ import * as actions from './actions'
 Vue.use(Vuex)
 // 应用初始状态
 const state = {
-	loginState: false,
+	token: '',
 	userInfo: {
 		id: 123
 	},
@@ -14,30 +14,29 @@ const state = {
 // 定义所需的 mutations
 const mutations = {
   hasLogin: (state, data) => {
-    state.loginState = data.token? true : false,
 	state.userInfo = data.result[0]
 	uni.setStorageSync('userInfo', data.result[0])
 	uni.setStorageSync('token', data.token)
-	if (state.loginState === false) {
-	}
+	uni.$emit('toJoinSocket')
   },
   getUserInfo: (state, data) => {
 	  state.userInfo = uni.getStorageSync('userInfo')
+	  state.token = uni.getStorageSync('token')
   },
   quitLogin: (state, data) => {
-	  uni.removeStorage({
-	      key: 'userInfo',
-	      success: function (res) {
-	          console.log('success');
-	      }
-	  });
+	  state.chatList = []
 	  uni.removeStorage({
 	      key: 'token',
 	      success: function (res) {
-	          console.log('success');
+	          console.log('退出登录')
+			  state.AllBadge = {}
 	      }
 	  });
-	  console.log('退出登录')
+	  // uni.removeStorage({
+	  //     key: 'userInfo',
+	  //     success: function (res) {
+	  //     }
+	  // });
   },
   getChatList(state, data) {
 	  let list = uni.getStorageSync(state.userInfo._id + 'chatList')
@@ -61,7 +60,9 @@ const mutations = {
 		  		  return pre + cur
 		  },0)
 	  })
-	  uni.setStorageSync(state.userInfo._id + 'chatList', state.chatList)
+	  if (state.userInfo._id !== undefined) {
+		  uni.setStorageSync(state.userInfo._id + 'chatList', state.chatList)
+	  }
   }
 }
 // 创建 store 实例
