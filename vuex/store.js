@@ -24,7 +24,7 @@ const mutations = {
 	  state.token = uni.getStorageSync('token')
   },
   quitLogin: (state, data) => {
-	  state.chatList = []
+	  state.AllBadge = []
 	  uni.removeStorage({
 	      key: 'token',
 	      success: function (res) {
