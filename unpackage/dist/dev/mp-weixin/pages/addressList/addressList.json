@@ -1,6 +1,0 @@
-{
-  "navigationBarTitleText": "通讯录",
-  "usingComponents": {
-    "uni-indexed-list": "/components/uni-indexed-list/uni-indexed-list"
-  }
-}
