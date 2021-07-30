@@ -29,7 +29,7 @@
 					<swiper class="swiper" :indicator-dots="indicatorDots" :autoplay="autoplay" :interval="interval" :duration="duration">
 						<swiper-item>
 							<view class="swiper-item">
-								<view class="add-select-list" v-for="(item, index) in sendInfo.slice(0,8)" :key="index">
+								<view class="add-select-list" v-for="(item, index) in sendInfo.slice(0,8)" :key="index" @tap="chooseFile(item.id)">
 									<view class="add-imgs">
 										<image class="tu" :src="item.img" mode=""></image>
 									</view>
@@ -67,6 +67,7 @@
 		props: ['userInfo', 'sendUserInfo'],
 		data() {
 			return {
+				randomStr: ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
 				sendMsg: '', // 发送的内容
 				showSendBtn: false, // 显示发送按钮
 				showFocus: false, // 获取输入框焦点
@@ -92,42 +93,52 @@
 				text: 'uni-app',
 				sendInfo: [
 					{
+						"id": 1,
 						"img": "../../../static/chat-room-img/xc.png",
 						"text": "相册"
 					},
 					{
+						"id": 2,
 						"img": "../../../static/chat-room-img/ps.png",
 						"text": "拍摄"
 					},
 					{
+						"id": 3,
 						"img": "../../../static/chat-room-img/th.png",
 						"text": "视频通话"
 					},
 					{
+						"id": 4,
 						"img": "../../../static/chat-room-img/wz.png",
 						"text": "位置"
 					},
 					{
+						"id": 5,
 						"img": "../../../static/chat-room-img/hb.png",
 						"text": "红包"
 					},
 					{
+						"id": 6,
 						"img": "../../../static/chat-room-img/zz.png",
 						"text": "转账"
 					},
 					{
+						"id": 7,
 						"img": "../../../static/chat-room-img/yy.png",
 						"text": "语音输入"
 					},
 					{
+						"id": 8,
 						"img": "../../../static/chat-room-img/sc.png",
 						"text": "我的收藏"
 					},
 					{
+						"id": 9,
 						"img": "../../../static/chat-room-img/mp.png",
 						"text": "名片"
 					},
 					{
+						"id": 10,
 						"img": "../../../static/chat-room-img/wj.png",
 						"text": "文件"
 					}
@@ -146,9 +157,27 @@
 		mounted(){
 		},	
 		methods: {
+			// selectFileType: function (id) {
+			// 	if (id === 1) {
+			// 		this.chooseFile(id)
+			// 	}
+			// },
 			getImageInfo: async function (src) {
 				return new Promise((resolve, reject) => {
 					uni.getImageInfo({
+							src: src,
+							success: (res) => {
+								resolve(res)
+							},
+							fail: (err) => {
+								reject(err)
+							}
+					})
+				})
+			},
+			getVideoInfo: async function (src) {
+				return new Promise((resolve, reject) => {
+					uni.getVideoInfo({
 							src: src,
 							success: (res) => {
 								resolve(res)
@@ -170,6 +199,7 @@
 			},
 			_sendMsg: function (msgType, msg, voiceT) {
 				let sendNewMsg = {
+						id: this._generateMixed(),
 						userId: this.userInfo._id,
 						sendId: this.sendUserInfo.id,
 						img: '../../../static/lufei.jpg',
@@ -178,33 +208,55 @@
 						msg: msg,
 						hot: 0,
 						voiceTime: voiceT,
-						move: 0
+						move: 0,
+						progress: 0,
 					}
 				if(msgType === 2) {
-					this.getImageInfo(sendNewMsg.msg).then((res) => {
+					this.getImageInfo(msg).then(res => {
 							sendNewMsg.height = res.height
 							sendNewMsg.width = res.width
-							this._chatMsg(sendNewMsg)
+							sendNewMsg.path = sendNewMsg.msg
+							uni.$emit('getSendData', sendNewMsg)
+							this._updataFile(msg, sendNewMsg)
 							this.sendMsg = ''
-						}).catch((err) => console.log(err))
+						}).catch(err => {
+							console.log(err)
+						})
+				} else if (msgType === 3) {
+					this.getVideoInfo(msg).then(res => {
+							sendNewMsg.height = res.height
+							sendNewMsg.width = res.width
+							sendNewMsg.path = sendNewMsg.msg
+							uni.$emit('getSendData', sendNewMsg)
+							this._updataFile(msg, sendNewMsg)
+							this.sendMsg = ''
+						}).catch(err => {
+							console.log(err)
+						})
 				} else if(msgType === 1) {
-					this._chatMsg(sendNewMsg)
+					uni.$emit('getSendData', sendNewMsg)
+					this.socket.emit('massage', sendNewMsg)
 					this.sendMsg = ''
 					this.showSendBtn = false
 				} else if (msgType === 4) {
-					this._chatMsg(sendNewMsg)
+					uni.$emit('getSendData', sendNewMsg)
 				}
 				this.$nextTick(function(){
 					// this.scrollToBottom()
 				})
 			},
+			_generateMixed: function() {
+				let res = ""
+				this.randomStr.forEach(item => {
+					let id = Math.ceil(Math.random() * 35);
+					res += this.randomStr[id];
+				})
+				return res
+			},
 			_addPlus: function () {
 				this.showIconFile = !this.showIconFile
 				uni.$emit('showFile', this.showIconFile)
 				// this.scrollToBottom()
-			},
-			_chatMsg:function (msgData) {
-				uni.$emit('getSendData', msgData)
 			},
 			stopBigView: function (e) {
 				console.log(e)
@@ -217,20 +269,53 @@
 				}
 				this.isRecording = !this.isRecording
 			},
-			chooseImg: function () {
-				uni.chooseImage({
-				    count: 9, //默认9
-				    sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-				    sourceType: ['album'], //从相册选择
-				    success: res => {
-						console.log(res.tempFiles)
-						res.tempFilePaths.forEach( item => {
-							this._sendMsg(2, item)
-							this.imgUrls.push(item)
-						})
-					}
-				})
+			chooseFile: function (id) {
+				if (id === 1) {
+					uni.chooseImage({
+					    count: 9, //默认9
+					    sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+					    sourceType: ['album'], //从相册选择
+					    success: res => {
+							const tempFilePaths = res.tempFilePaths;
+							res.tempFilePaths.forEach(item => {
+								this._sendMsg(2, item)
+							})
+						}
+					})
+				} else if (id === 2) {
+					uni.chooseVideo({
+						count: 1,
+						sourceType: ['camera', 'album'],
+						success: res => {
+							// console.log(res.tempFilePath)
+							this._sendMsg(3, res.tempFilePath)
+						}
+					});
+				}
 				
+			},
+			_updataFile: function (filePath, sendTo) {
+				uni.uploadFile({
+						url: 'http://10.10.20.128:8668/sendUploadFile', //仅为示例，非真实的接口地址
+						filePath: filePath,
+						fileType: 'image/video/audio',
+						name: 'file',
+						formData: {},
+						success: (uploadFileRes) => {
+							console.log(uploadFileRes.data)
+							sendTo.msg = uploadFileRes.data
+							sendTo.path = uploadFileRes.data
+							this.socket.emit('massage', sendTo)
+						}
+					}).onProgressUpdate((res) => {
+						res.path = filePath
+						uni.$emit('listenUpdateProgress', res)
+						// console.log('上传进度' + res.progress);		
+					// 测试条件，取消上传任务。
+					if (res.progress > 50) {
+						// uploadTask.abort();
+					}
+				});
 			},
 			onFocus: function () {
 				this.showFocus = true

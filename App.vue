@@ -96,7 +96,7 @@
 					} else {
 						console.log('用户信息无效, 连接socket失败')
 					}
-				}, 300)
+				}, 1000)
 			},
 			linkSocketMsg: function () {
 				this.socket.on('getMassage', data => {

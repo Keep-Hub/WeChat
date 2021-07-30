@@ -14,18 +14,40 @@
 						<view class="chat-bubble" :class="item.userId === userInfo._id && item.msgType === 1 ? (item.msgType === 1 ?'bg-color-g' : '') : (item.msgType === 1 ?'bg-color-b' : '')">
 							<text class="square" :class="item.userId === userInfo._id && item.msgType === 1? (item.msgType === 1 ?'right' : '') : (item.msgType === 1 ?'left' : '')"></text>
 							<view class="msg-info">
+									<u-circle-progress
+										 v-if="(item.msgType === 2 || item.msgType === 3) && item.userId === userInfo._id"
+										 bg-color="transparent"
+										 active-color="#cccccc"
+										 :percent="item.progress"
+										 :width="50"
+										 :border-width="6"
+										 style="align-self: center; margin-right: 10rpx;"
+										 >
+									</u-circle-progress>
 								<view class="msg-text" v-if="item.msgType === 1">
 									{{item.msg}}
 								</view>
 								<image
-								 class="image-zoom" 
-								 :class="item.height >= 320? 'max' : (item.height > 60 ? 'small' : 'min')"
-								 v-else-if="item.msgType === 2"
-								 :src="item.msg"
-								 ref="imgSize"
-								 @click="onPreviewImage(item.msg)"
-								 :mode="calculateProportion(item.width, item.height, item)"
+									 v-else-if="item.msgType === 2"
+									 class="image-zoom" 
+									 :class="item.height >= 320? 'max' : (item.height > 60 ? 'small' : 'min')"
+									 :src="item.msg"
+									 ref="imgSize"
+									 @click="onPreviewImage(item.msg)"
+									 :mode="calculateProportion(item.width, item.height, item)"
 								 ></image>
+								 <video
+									:id="item.msg"
+									v-else-if="item.msgType === 3"
+								    :src="item.msg"
+									class="image-zoom"
+									:class="item.height >= 320? 'max' : (item.height > 60 ? 'small' : 'min')"
+									@play="playVedio(item.msg)"
+									@fullscreenchange="quitVideo($event,item.msg)"
+									direction="0"
+									poster
+									controls
+									></video>
 								 <view class="recorder-msg" @tap="playVoice(item)" v-else-if="item.msgType === 4" :class="item.userId === userInfo._id && item.msgType === 4 ? (item.msgType === 4 ?'bg-color-g' : '') : (item.msgType === 4 ?'bg-color-b' : '')">
 									<text class="voice-time" v-if="item.userId === userInfo._id" style="text-align: right;" :style="{ width: (item.voiceTime * 4) + 'rpx' }">{{item.voiceTime}}″</text>
 									<view class="voice-box" :class="item.userId === userInfo._id && item.msgType === 4 ? 'f-r' : ''">
@@ -102,6 +124,7 @@
 				 },
 				 pageNub: 1,
 				 allChatData: [],
+				 progressList: []
 			}
 		},
 		onLoad(option) {
@@ -153,8 +176,12 @@
 			// 	})
 			// })
 			uni.$on('getSendData', (data) => {
-				this.socket.emit('massage', data)
 				this.chatData.push(data)
+				this.chatData.forEach(i => {
+					if(i.msgType === 2) {
+						this.imgUrls.push(i.msg)
+					}
+				})
 				uni.setStorage({key: data.userId + '_' + data.sendId, data: this.chatData})
 				uni.$emit('updataMsg', data)
 				this.$nextTick(function(){
@@ -162,12 +189,24 @@
 				})
 			})
 			uni.$on('showFile', (data) => {
-				this.scrollPadding = data
-				console.log(data)
+				this.scrollPadding = data	
+				this.$nextTick(function() {
+					uni.pageScrollTo({scrollTop: 99999, duration: 0})
+					
+				});
 			})
 			// this.timeConversion()
 		},	
 		methods: {
+			playVedio: function (id) {
+				// 获取 video 上下文 videoContext 对象
+                uni.createVideoContext(id).requestFullScreen()
+                // 进入全屏状态
+				
+			},
+			quitVideo: function (e, id) {
+				uni.createVideoContext(id).pause()
+			},
 			...mapActions(['getUserInfo', 'getChatList']),
 			_nextPage: function () {
 				this.pageNub++
@@ -204,20 +243,33 @@
 					success: (res) => {
 						this.allChatData = res.data;
 						this.chatData = this.getPages(this.pageNub)
+						this.chatData.forEach(i => {
+							if(i.msgType === 2) {
+								this.imgUrls.push(i.msg)
+							}
+						})
 						this.$nextTick(function(){
 							this.scrollToView = 'msg' + (this.chatData.length - 1)
 						})
 					}
-				});
-				this.chatData.forEach(i => {
-					if(i.msgType === 2) {
-						this.imgUrls.push(i.msg)
-						this.getImageInfo(i.msg).then((res) => {
-								i.height = res.height
-								i.width = res.width
-							}).catch((err) => console.log(err))
-					}
-					
+				});	
+				uni.$on('listenUpdateProgress', res => {
+					this.chatData.slice(this.chatData.length - 9,this.chatData.length).forEach(item => {
+						if (item.msg === res.path) {
+							item.progress = res.progress
+						} else {
+							// console.log('没有')
+						}
+					})
+					// this.progressList.forEach(item => {
+					// 	// console.log(item.path)
+					// 	if (res.path === item.path) {
+					// 		item.progress = res.progress
+					// 		console.log(this.progressList)
+					// 	} else {
+					// 		this.progressList.push(res)
+					// 	}
+					// })
 				})
 			},
 			calculateProportion: function (w, h, row) {
@@ -276,6 +328,11 @@
 					if (data.userId === this.sendUserInfo.id && this.getMsgFalg === true) {
 						data.hot = 0
 						this.chatData.push(data)
+						this.chatData.forEach(i => {
+							if(i.msgType === 2) {
+								this.imgUrls.push(i.msg)
+							}
+						})
 						uni.setStorage({key: data.sendId + '_' + data.userId,data: this.chatData})
 						uni.$emit('setTabBarItem')
 						this.$nextTick(function(){
@@ -496,6 +553,7 @@
 							line-height: 48rpx;
 							align-self: center;
 							font-size: 32rpx;
+							display: flex;
 								.msg-text {
 									padding: 14rpx 20rpx;
 								}
