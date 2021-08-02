@@ -31,21 +31,20 @@
 									 v-else-if="item.msgType === 2"
 									 class="image-zoom" 
 									 :class="item.height >= 320? 'max' : (item.height > 60 ? 'small' : 'min')"
-									 :src="item.msg"
+									 :src="item.path"
 									 ref="imgSize"
-									 @click="onPreviewImage(item.msg)"
+									 @click="onPreviewImage(item.path, item)"
 									 :mode="calculateProportion(item.width, item.height, item)"
 								 ></image>
 								 <video
-									:id="item.msg"
+									:id="item.path"
 									v-else-if="item.msgType === 3"
-								    :src="item.msg"
+								    :src="item.path"
 									class="image-zoom"
 									:class="item.height >= 320? 'max' : (item.height > 60 ? 'small' : 'min')"
-									@play="playVedio(item.msg)"
-									@fullscreenchange="quitVideo($event,item.msg)"
+									@play="playVedio(item.path)"
+									@fullscreenchange="quitVideo($event,item.path)"
 									direction="0"
-									poster
 									controls
 									></video>
 								 <view class="recorder-msg" @tap="playVoice(item)" v-else-if="item.msgType === 4" :class="item.userId === userInfo._id && item.msgType === 4 ? (item.msgType === 4 ?'bg-color-g' : '') : (item.msgType === 4 ?'bg-color-b' : '')">
@@ -179,7 +178,7 @@
 				this.chatData.push(data)
 				this.chatData.forEach(i => {
 					if(i.msgType === 2) {
-						this.imgUrls.push(i.msg)
+						this.imgUrls.push(i.path)
 					}
 				})
 				uni.setStorage({key: data.userId + '_' + data.sendId, data: this.chatData})
@@ -245,7 +244,7 @@
 						this.chatData = this.getPages(this.pageNub)
 						this.chatData.forEach(i => {
 							if(i.msgType === 2) {
-								this.imgUrls.push(i.msg)
+								this.imgUrls.push(i.path)
 							}
 						})
 						this.$nextTick(function(){
@@ -324,22 +323,27 @@
 				}
 			},
 			_getMsg: function () {
-				this.socket.on('getMassage', data => {
+				this.socket.on('getMassage', async data => {
 					if (data.userId === this.sendUserInfo.id && this.getMsgFalg === true) {
+						if (data.msgType === 2 || data.msgType === 3) {
+							await this.downloadImg(data.path).then( res => {
+								data.path = res.savedFilePath
+							})
+						}
 						data.hot = 0
-						this.chatData.push(data)
-						this.chatData.forEach(i => {
+						await this.chatData.push(data)
+						await this.chatData.forEach(i => {
 							if(i.msgType === 2) {
-								this.imgUrls.push(i.msg)
+								this.imgUrls.push(i.path)
 							}
 						})
-						uni.setStorage({key: data.sendId + '_' + data.userId,data: this.chatData})
-						uni.$emit('setTabBarItem')
-						this.$nextTick(function(){
+						await uni.setStorage({key: data.sendId + '_' + data.userId,data: this.chatData})
+						await uni.$emit('setTabBarItem')
+						await this.$nextTick(function(){
 							this.scrollToView = 'msg' + (this.chatData.length - 1)
 						})
 					}
-				})	
+				})
 			},
 			bigView: function () {
 				this.showIconFlie = false
@@ -348,12 +352,13 @@
 			stopBigView: function () {
 				
 			},
-			onPreviewImage: function (index) {
+			onPreviewImage: function (index, row) {
 				let currentIndex = 0
 				this.imgUrls.forEach((item, i) => {
 					if(item === index) {
 						currentIndex = i
 					}
+					
 				})
 				uni.previewImage({
 					current: currentIndex,
@@ -368,6 +373,26 @@
 						}
 					}
 				});
+			},
+			// 接收图片并且下载
+			downloadImg: function(imgUrl) {
+				return new Promise((resolve, reject) => {
+					uni.downloadFile({
+					url: imgUrl,
+					success: (res) => {
+						uni.saveFile({
+							tempFilePath: res.tempFilePath,
+							success: function(red) {
+								// console.log(red.savedFilePath)
+								resolve(red)
+							}
+						});
+					},
+					fail: (err) => {
+						reject(err)
+					}
+				})
+			 })
 			},
 			onFocus: function () {
 				this.showFocus = true

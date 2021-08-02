@@ -99,9 +99,14 @@
 				}, 1000)
 			},
 			linkSocketMsg: function () {
-				this.socket.on('getMassage', data => {
+				this.socket.on('getMassage', async data => {
+					if (data.msgType === 2 || data.msgType === 3) {
+						await this.downloadImg(data.path).then( res => {
+							data.path = res.savedFilePath
+						})
+					}
 					let chatData = []
-					uni.getStorage({
+					await uni.getStorage({
 						key: this.userInfo._id + '_' + data.userId,
 						success: (res) => {
 							chatData = res.data;
@@ -116,6 +121,26 @@
 						}
 					})
 				})
+			},
+			// 接收图片并且下载
+			downloadImg: function(imgUrl) {
+				return new Promise((resolve, reject) => {
+					uni.downloadFile({
+					url: imgUrl,
+					success: (res) => {
+						uni.saveFile({
+							tempFilePath: res.tempFilePath,
+							success: function(red) {
+								// console.log(red.savedFilePath)
+								resolve(red)
+							}
+						});
+					},
+					fail: (err) => {
+						reject(err)
+					}
+				})
+			 })
 			},
 			updataMsg: function (id, data) {
 				uni.getStorage({

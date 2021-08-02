@@ -116,7 +116,7 @@ export default {
 			// this.showEmailTip = false
 		},
 		emailFocus () {
-			if (this.email.length > 0) {
+			if (this.email) {
 				this.showEmailTip = true
 				this._tips()
 			}

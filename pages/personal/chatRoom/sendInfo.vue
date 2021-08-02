@@ -205,35 +205,56 @@
 						img: '../../../static/lufei.jpg',
 						time: new Date(),
 						msgType: msgType, // 1-文字 2-图片 3-视频 4-语音 5-红包 6-表情
-						msg: msg,
+						msg: '',
 						hot: 0,
 						voiceTime: voiceT,
 						move: 0,
 						progress: 0,
 					}
 				if(msgType === 2) {
-					this.getImageInfo(msg).then(res => {
+					this.getImageInfo(msg).then(async res => {
 							sendNewMsg.height = res.height
 							sendNewMsg.width = res.width
-							sendNewMsg.path = sendNewMsg.msg
-							uni.$emit('getSendData', sendNewMsg)
-							this._updataFile(msg, sendNewMsg)
+							sendNewMsg.msg = '[图片]'
+							if (uni.getSystemInfoSync().platform === "android") {
+							 	await uni.saveFile({
+									tempFilePath: res.tempFilePath,
+									success: function(res) {
+										sendNewMsg.path = res.savedFilePath
+									}
+								});
+							} else {
+								sendNewMsg.path = msg
+							}
+							await uni.$emit('getSendData', sendNewMsg)
+							await this._updataFile(msg, sendNewMsg)
 							this.sendMsg = ''
 						}).catch(err => {
 							console.log(err)
 						})
 				} else if (msgType === 3) {
-					this.getVideoInfo(msg).then(res => {
+					this.getVideoInfo(msg).then(async res => {
 							sendNewMsg.height = res.height
 							sendNewMsg.width = res.width
-							sendNewMsg.path = sendNewMsg.msg
-							uni.$emit('getSendData', sendNewMsg)
-							this._updataFile(msg, sendNewMsg)
+							sendNewMsg.msg = '[视频]'
+							if (uni.getSystemInfoSync().platform === "android") {
+							 	await uni.saveFile({
+									tempFilePath: res.tempFilePath,
+									success: function(res) {
+										sendNewMsg.path = res.savedFilePath
+									}
+								});
+							} else {
+								sendNewMsg.path = msg
+							}
+							await uni.$emit('getSendData', sendNewMsg)
+							await this._updataFile(msg, sendNewMsg)
 							this.sendMsg = ''
 						}).catch(err => {
 							console.log(err)
 						})
 				} else if(msgType === 1) {
+					sendNewMsg.msg = msg
 					uni.$emit('getSendData', sendNewMsg)
 					this.socket.emit('massage', sendNewMsg)
 					this.sendMsg = ''
@@ -302,8 +323,6 @@
 						name: 'file',
 						formData: {},
 						success: (uploadFileRes) => {
-							console.log(uploadFileRes.data)
-							sendTo.msg = uploadFileRes.data
 							sendTo.path = uploadFileRes.data
 							this.socket.emit('massage', sendTo)
 						}
