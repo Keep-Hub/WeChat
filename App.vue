@@ -4,30 +4,35 @@
 	import {mapState, mapActions} from 'vuex'
 	export default {
 		onLaunch: function() {
-			  // uni.clearStorage();
-			  switch(uni.getSystemInfoSync().platform){
-			      case 'android':
-			         console.log('运行Android上')
-					 // 手机禁止横屏 app
-					 plus.screen.lockOrientation("portrait-primary");
-			         break;
-			      case 'ios':
-			         console.log('运行iOS上')
-			         break;
-			      default:
-			         console.log('运行在开发者工具上')
-			         break;
-			  }
+			//#ifdef APP-PLUS
+				plus.screen.lockOrientation("portrait-primary");
+			//#endif
+			//#ifdef H5
+			//#endif
+			// uni.clearStorage();
 		},
 		computed: {
 		    ...mapState(['userInfo','chatList','AllBadge', 'token'])
 		},
 		onShow: function() {
+			//监听网络状态变化
+			uni.onNetworkStatusChange((res)=>{
+				uni.$emit('networkStatus', res)
+				if (res.isConnected) {
+					this.$nextTick(function(){
+						this.joinSocket(this.userInfo._id)
+					})
+				} else {
+					this.socket.emit('leaveRoom',{"_id": this.userInfo._id})
+				}
+			});
 			this.$nextTick(function(){
 				if (this.token === '') {
 					uni.reLaunch({
 							url: './pages/logon/login'
 					})
+				} else if (this.userInfo !== '' && this.token !== '') {
+					this.joinSocket(this.userInfo._id)
 				} else {
 					logonApi.testToken({token: this.token}).then(data => {
 						if (data.code === 2001) {
@@ -45,17 +50,7 @@
 					})
 				}
 			})
-			
-			uni.getStorage({
-				key: 'token',
-				success:(res) => {
-				},
-				fail: (res) => {
-					
-				}
-			});
 			this.getUserInfo()
-			this.joinSocket()
 			this.linkSocketMsg()
 			uni.$on('setTabBarItem', async(res) => {
 				await this.getChatList()
@@ -63,15 +58,13 @@
 				await this.getBadge(this.AllBadge)
 			})
 			uni.$on('toJoinSocket', res => {
-				this.joinSocket()
+				this.joinSocket(res.result[0]._id)
 			})
 			uni.$on('updataMsg', res => {
 				this.updataMsg(res.sendId, res)
 			})
-			// console.log('App Show')
 		},
 		onHide: function() {
-			// console.log('App Hide')
 		},
 		methods: {  
 		    ...mapActions(['getLoginToken', 'getChatList', 'getUserInfo', 'getAllBadge']),
@@ -89,21 +82,33 @@
 				}
 				// plus.runtime.setBadgeNumber(data.unreadMsg);
 			},
-			joinSocket: function () {
-				setTimeout(() => {
-					if (this.userInfo !== '' && this.token !== '') {
-						this.socket.emit('setRoom',{"_id": this.userInfo._id})
-					} else {
-						console.log('用户信息无效, 连接socket失败')
-					}
-				}, 1000)
+			joinSocket: function (linkId) {
+				this.socket.emit('setRoom',{"_id": linkId})
 			},
 			linkSocketMsg: function () {
 				this.socket.on('getMassage', async data => {
-					if (data.msgType === 2 || data.msgType === 3) {
-						await this.downloadImg(data.path).then( res => {
+					//#ifdef APP-PLUS
+					if (data.msgType === 3) {
+							await this.downloadFile(data.thumbnail).then( res => {
+								data.thumbnail = res.savedFilePath
+							})
+					} else if (data.msgType === 2) {
+						await this.downloadFile(data.path).then( res => {
 							data.path = res.savedFilePath
 						})
+					}
+					//#endif
+					// 聊天页面接收
+					let pages = getCurrentPages(); //当前页
+					if (pages[pages.length - 1].route === "pages/personal/chatRoom/chatRoom") {
+						// 获取当前聊天的对象
+						let currentChatId = pages[pages.length - 1].options.item.indexOf(data.userId)
+						if (currentChatId !== -1) {
+							console.log(5)
+							data.hot = 0
+							uni.$emit('chatRoomReception', data)
+						}
+						
 					}
 					let chatData = []
 					await uni.getStorage({
@@ -123,7 +128,7 @@
 				})
 			},
 			// 接收图片并且下载
-			downloadImg: function(imgUrl) {
+			downloadFile: function(imgUrl) {
 				return new Promise((resolve, reject) => {
 					uni.downloadFile({
 					url: imgUrl,
@@ -131,7 +136,6 @@
 						uni.saveFile({
 							tempFilePath: res.tempFilePath,
 							success: function(red) {
-								// console.log(red.savedFilePath)
 								resolve(red)
 							}
 						});

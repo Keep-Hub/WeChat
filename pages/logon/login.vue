@@ -65,7 +65,6 @@ export default {
 			key: 'userInfo',
 			success:(res) => {
 				this.email = res.data.mail
-				console.log(res.data.mail)
 			},
 			fail: (res) => {
 			}
@@ -129,7 +128,6 @@ export default {
 			logonApi.login(params).then(data => {
 				if (data.code === 2000) {
 					this.token = data.token
-					// uni.setStorageSync('token', data.token)
 					this.getLoginToken(data)
 					setTimeout(() => {
 						uni.switchTab({

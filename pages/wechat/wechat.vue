@@ -77,7 +77,7 @@
 		    onLoad() {
 				const pages = getCurrentPages();  
 				const page = pages[pages.length - 1];
-				if (uni.getSystemInfoSync().platform === 'android') {
+				//#ifdef APP-PLUS
 					const currentWebview = page.$getAppWebview();
 					currentWebview.setStyle({  
 					  pullToRefresh: {  
@@ -86,14 +86,36 @@
 					  }  
 					});  
 					this.isSupport = !this.isSupport;
-				}
+				//#endif
 				uni.startPullDownRefresh();
 				this.init()
 		    },
 			watch: {
 			},
 			onShow () {
-				uni.$emit('setTabBarItem')
+				//获取网络类型
+				uni.getNetworkType({
+					success: function (res) {
+						if (res.networkType === "none") {
+							uni.$emit('networkStatus', {isConnected: false})
+						} else {
+							uni.$emit('setTabBarItem')
+						}
+					}
+				});
+				uni.$on('networkStatus', res => {
+					// 判断网络是否连接
+					if (res.isConnected) {
+						uni.$emit('setTabBarItem')
+					} else {
+						let pages = getCurrentPages(); //当前页
+						if (pages[pages.length - 1].route === 'pages/wechat/wechat') {
+							uni.setNavigationBarTitle({
+							　　title: '微信 (未连接)'
+							})
+						}
+					}
+				})
 				uni.$on('setWeChatTitleBadge', res => {
 					// this.$forceUpdate()
 					let pages = getCurrentPages(); //当前页

@@ -17,7 +17,7 @@ const mutations = {
 	state.userInfo = data.result[0]
 	uni.setStorageSync('userInfo', data.result[0])
 	uni.setStorageSync('token', data.token)
-	uni.$emit('toJoinSocket')
+	uni.$emit('toJoinSocket', data)
   },
   getUserInfo: (state, data) => {
 	  state.userInfo = uni.getStorageSync('userInfo')

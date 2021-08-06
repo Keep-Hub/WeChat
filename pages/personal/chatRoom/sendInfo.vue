@@ -175,19 +175,6 @@
 					})
 				})
 			},
-			getVideoInfo: async function (src) {
-				return new Promise((resolve, reject) => {
-					uni.getVideoInfo({
-							src: src,
-							success: (res) => {
-								resolve(res)
-							},
-							fail: (err) => {
-								reject(err)
-							}
-					})
-				})
-			},
 			sendChange: function (){
 				let reg = /^(?!(\s+$))/ //不能全是空格
 				if (this.sendMsg.length > 0 && reg.test(this.sendMsg)) {
@@ -197,7 +184,7 @@
 					this.showSendBtn = false
 				}
 			},
-			_sendMsg: function (msgType, msg, voiceT) {
+			_sendMsg: async function (msgType, msg, voiceT) {
 				let sendNewMsg = {
 						id: this._generateMixed(),
 						userId: this.userInfo._id,
@@ -210,6 +197,8 @@
 						voiceTime: voiceT,
 						move: 0,
 						progress: 0,
+						thumbnail: '',
+						videoDuration: 0
 					}
 				if(msgType === 2) {
 					this.getImageInfo(msg).then(async res => {
@@ -226,33 +215,19 @@
 							} else {
 								sendNewMsg.path = msg
 							}
-							await uni.$emit('getSendData', sendNewMsg)
-							await this._updataFile(msg, sendNewMsg)
+							await this._updataFile(msg, sendNewMsg, msgType)
 							this.sendMsg = ''
 						}).catch(err => {
 							console.log(err)
 						})
 				} else if (msgType === 3) {
-					this.getVideoInfo(msg).then(async res => {
-							sendNewMsg.height = res.height
-							sendNewMsg.width = res.width
-							sendNewMsg.msg = '[视频]'
-							if (uni.getSystemInfoSync().platform === "android") {
-							 	await uni.saveFile({
-									tempFilePath: res.tempFilePath,
-									success: function(res) {
-										sendNewMsg.path = res.savedFilePath
-									}
-								});
-							} else {
-								sendNewMsg.path = msg
-							}
-							await uni.$emit('getSendData', sendNewMsg)
-							await this._updataFile(msg, sendNewMsg)
-							this.sendMsg = ''
-						}).catch(err => {
-							console.log(err)
-						})
+					sendNewMsg.height = msg.height
+					sendNewMsg.width = msg.width
+					sendNewMsg.msg = '[视频]'
+					sendNewMsg.videoDuration = msg.duration
+					sendNewMsg.path = msg.tempFilePath
+					await this._updataFile(msg.tempFilePath, sendNewMsg, msgType)
+					this.sendMsg = ''
 				} else if(msgType === 1) {
 					sendNewMsg.msg = msg
 					uni.$emit('getSendData', sendNewMsg)
@@ -297,6 +272,7 @@
 					    sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
 					    sourceType: ['album'], //从相册选择
 					    success: res => {
+							console.log(res)
 							const tempFilePaths = res.tempFilePaths;
 							res.tempFilePaths.forEach(item => {
 								this._sendMsg(2, item)
@@ -309,21 +285,26 @@
 						sourceType: ['camera', 'album'],
 						success: res => {
 							// console.log(res.tempFilePath)
-							this._sendMsg(3, res.tempFilePath)
+							this._sendMsg(3, res)
 						}
 					});
 				}
 				
 			},
-			_updataFile: function (filePath, sendTo) {
+			_updataFile: function (filePath, sendTo, type) {
 				uni.uploadFile({
 						url: 'http://10.10.20.128:8668/sendUploadFile', //仅为示例，非真实的接口地址
 						filePath: filePath,
 						fileType: 'image/video/audio',
 						name: 'file',
-						formData: {},
+						formData: {
+							fileType: type
+						},
 						success: (uploadFileRes) => {
-							sendTo.path = uploadFileRes.data
+							sendTo.path = JSON.parse(uploadFileRes.data).normogram
+							sendTo.thumbnail = JSON.parse(uploadFileRes.data).thumbnail
+							sendTo.videoDuration = JSON.parse(uploadFileRes.data).duration
+							uni.$emit('getSendData', sendTo)
 							this.socket.emit('massage', sendTo)
 						}
 					}).onProgressUpdate((res) => {
@@ -384,7 +365,6 @@
 							this._sendMsg(4, res.tempFilePath, this.voiceDuration)
 							this.voiceDuration = 0
 						}
-						// _sendMsg(4, res.tempFilePath, this.voiceDuration)
 					});
 				}
 			},
@@ -422,9 +402,8 @@
 			position: fixed;
 			bottom: 0;
 			width: 100%;
-			min-height: 80rpx;
+			min-height: 100rpx;
 			background:rgba(255,255,255, 1);
-			
 			.send-info {
 				display: flex;
 				padding: 16rpx 0;

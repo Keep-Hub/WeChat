@@ -1,6 +1,16 @@
 <template>
 	<view>
-		<scroll-view @scrolltoupper="_nextPage()" :upper-threshold="50" @tap="bigView()" @touchstart="bigView()" id="scrollview" scroll-y="false" :style="{height: (style.contentViewHeight*2 + chatScreen) + 'rpx', 'padding-bottom': (scrollPadding ? '640rpx' : '0rpx')}" :scroll-with-animation="scrollAnimation" :scroll-y="true" :scroll-into-view="scrollToView">
+		<scroll-view 
+		@scrolltoupper="_nextPage()" 
+		:upper-threshold="50" 
+		@tap="bigView()" 
+		@touchstart="bigView()" 
+		id="scrollview" 
+		scroll-y="false" 
+		:style="{height: (style.contentViewHeight*2 + chatScreen) + 'rpx', 'padding-bottom': (scrollPadding ? '640rpx' : '0rpx')}" 
+		:scroll-with-animation="scrollAnimation"
+		:scroll-y="true" 
+		:scroll-into-view="scrollToView">
 			<view v-if="loading"><image class="loading-img" src="../../../static/loading.png" mode=""></image></view>
 			<view v-for="(item, index) in chatData" :key="index" :id="'msg' + index">
 				<view v-if="fiveMinutesApart(item.time, index, chatData)" class="send-time">
@@ -33,20 +43,21 @@
 									 :class="item.height >= 320? 'max' : (item.height > 60 ? 'small' : 'min')"
 									 :src="item.path"
 									 ref="imgSize"
-									 @click="onPreviewImage(item.path, item)"
+									 @tap="onPreviewImage(item.path, item)"
 									 :mode="calculateProportion(item.width, item.height, item)"
 								 ></image>
-								 <video
-									:id="item.path"
+								 <view 
 									v-else-if="item.msgType === 3"
-								    :src="item.path"
-									class="image-zoom"
-									:class="item.height >= 320? 'max' : (item.height > 60 ? 'small' : 'min')"
-									@play="playVedio(item.path)"
-									@fullscreenchange="quitVideo($event,item.path)"
-									direction="0"
-									controls
-									></video>
+									:class="item.width/item.height >= 1? 'horizontal' : 'vertical'"
+									class="video-bg"
+									:style="{background: 'url(' + item.thumbnail + ')' + 'no-repeat', backgroundSize: '100% auto'}"
+									@tap="playVedio(item.path, item.width/item.height)"
+								 >
+									  <view class="video-bg-2" style="width: 100%; height: 100%; background-color: transparent;display: flex;">
+									  	<image class="play-btn" src="../../../static/play.png"></image>
+									  	<text class="video-duration">{{videoTimeFormat(item.videoDuration)}}</text>
+									  </view>
+								 </view>
 								 <view class="recorder-msg" @tap="playVoice(item)" v-else-if="item.msgType === 4" :class="item.userId === userInfo._id && item.msgType === 4 ? (item.msgType === 4 ?'bg-color-g' : '') : (item.msgType === 4 ?'bg-color-b' : '')">
 									<text class="voice-time" v-if="item.userId === userInfo._id" style="text-align: right;" :style="{ width: (item.voiceTime * 4) + 'rpx' }">{{item.voiceTime}}″</text>
 									<view class="voice-box" :class="item.userId === userInfo._id && item.msgType === 4 ? 'f-r' : ''">
@@ -64,6 +75,18 @@
 					</view>
 				</view>
 			</view>
+			<video
+			    v-if="showVideoPlay"
+				id="screenVideo"
+				style="width: 0; height: 0;"
+				:src="playVideoUrl"
+				@fullscreenchange="screenChange"
+				:enable-play-gesture="true"
+				:show-center-play-btn="false"
+				objectFit="contain"
+				:controls="true"
+				:autoplay="true"
+				></video>
 		</scroll-view>
 		<send-info :userInfo="userInfo" :sendUserInfo="sendUserInfo"></send-info>
 	</view>
@@ -80,38 +103,18 @@
 		},
 		data() {
 			return {
+				showVideoPlay: false,
+				playVideoUrl: '',
 				scrollToView: '',
 				loading: false,
 				loadAnimation: {},
 				chatScreen: 0,
 				sendUserInfo: null,
 				chatData: [],
-				getMsgFalg: false, // 开启页面接受socket的消息
 				scrollAnimation: false, // 是否开启滚动动画
-				sendMsg: '', // 发送的内容
-				showSendBtn: false, // 显示发送按钮
-				showFocus: false, // 获取输入框焦点
-				isRecording: true, // 按住说话
-				showIconFlie: false, // 显示文件和表情
 				scrollTop: '9999',
-				indicatorDots: true,
 				autoplay: false,
-				interval: 2000,
 				duration: 300,
-				voicePath: '',
-				voiceTiming: '', // 录音计时
-				voiceDuration: 0, // 录音时长
-				voicePopup: false,
-				cancalSend: false,
-				voiceAnimation: 'fadeInOut',
-				moveCancal: 0,
-				moveText: 0,
-				x: 150,
-				y: 600,
-				old: {
-					x: 0,
-					y: 0
-				},
 				text: 'uni-app',
 				imgUrls: [], // 预览图片路径集合
 				scrollPadding: false,
@@ -123,26 +126,13 @@
 				 },
 				 pageNub: 1,
 				 allChatData: [],
-				 progressList: []
 			}
 		},
 		onLoad(option) {
 			this.sendUserInfo = JSON.parse(decodeURIComponent(option.item));
 			this.init()
-			// var animation = uni.createAnimation({
-			//       duration: 1,
-			//       timingFunction: 'step-start',
-			//     })
-			// 	let i = 1
-			//     this.animation = animation
-			//     setInterval(function() {
-			//       animation.rotate(i + 30).step()
-			//       this.loadAnimation = animation.export()
-			// 	  i++
-			//     }.bind(this), 10)
 		},
 		onShow () {
-			this.getMsgFalg = true
 		},
 		computed: {
 		    ...mapState(['chatList', 'userInfo'])
@@ -156,37 +146,45 @@
 		　　　this.style.contentViewHeight = res.windowHeight - uni.getSystemInfoSync().screenWidth / 750 * (100) //像素   因为给出的是像素高度 然后我们用的是upx  所以换算一下 
 		},
 		onPullDownRefresh() {
-				// console.log('refresh');
 				// setTimeout(function () {
 				// 	uni.stopPullDownRefresh();
 				// }, 1000);
 		},
-		mounted(){
+		async mounted(){
 			if (uni.getSystemInfoSync().platform === 'android') {
 				this.chatScreen = 45
+			} else if (uni.getSystemInfoSync().platform === "ios") {
+				this.chatScreen = -50
 			} else {
 				this.chatScreen = 0
 			}
-			this._getMsg()
-			// uni.$on('updataChatRoomMsg', res => {
-			// 	uni.$emit('setTabBarItem')
-			// 	this.$nextTick(function(){
-			// 		this.scrollToView = 'msg' + (this.chatData.length - 1)
-			// 	})
-			// })
-			uni.$on('getSendData', (data) => {
-				this.chatData.push(data)
-				this.chatData.forEach(i => {
-					if(i.msgType === 2) {
-						this.imgUrls.push(i.path)
-					}
-				})
-				uni.setStorage({key: data.userId + '_' + data.sendId, data: this.chatData})
-				uni.$emit('updataMsg', data)
+			uni.$on('chatRoomReception', res => {
+				this.chatData.push(res)
 				this.$nextTick(function(){
 					this.scrollToView = 'msg' + (this.chatData.length - 1)
 				})
 			})
+			// 监听发送的文件
+			uni.$on('getSendData', async (data) => {
+				//#ifdef APP-PLUS
+				if (data.msgType === 3) {
+						await this.downloadFile(data.thumbnail).then( res => {
+							data.thumbnail = res.savedFilePath
+						})
+				} else if (data.msgType === 2) {
+					await this.downloadFile(data.path).then( res => {
+						data.path = res.savedFilePath
+					})
+				}
+				//#endif
+				await this.chatData.push(data)
+				await uni.setStorageSync(data.userId + '_' + data.sendId, this.chatData)
+				await uni.$emit('updataMsg', data)
+				this.$nextTick(function(){
+					this.scrollToView = 'msg' + (this.chatData.length - 1)
+				})
+			})
+			// 点击文件框的时候向上撑开
 			uni.$on('showFile', (data) => {
 				this.scrollPadding = data	
 				this.$nextTick(function() {
@@ -197,14 +195,41 @@
 			// this.timeConversion()
 		},	
 		methods: {
-			playVedio: function (id) {
-				// 获取 video 上下文 videoContext 对象
-                uni.createVideoContext(id).requestFullScreen()
-                // 进入全屏状态
-				
+			// videoUrl->视频链接 ratio->生成图片的大小比例 quality->图片质量 0.1 - 1
+			videoToImg (videoUrl, ratio, quality) {
+				return new Promise((resolve, reject) => {
+					// 获取video节点
+					const video = document.createElement("video");
+					video.setAttribute('crossOrigin', 'Anonymous')
+					video.src = videoUrl;
+					//如果不设置currentTime，画出来的图片是空的
+					video.currentTime = 1;
+					video.onloadeddata = function(e) {
+						let canvas = document.createElement('canvas');
+						//判断视频的高度和宽度
+						//画布的大小，由设置的视频显示的大小决定
+						canvas.width = e.path[0].videoWidth * ratio;
+						canvas.height = e.path[0].videoHeight * ratio;
+						canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+						resolve(canvas.toDataURL('image/png', quality))
+					};
+				})
 			},
-			quitVideo: function (e, id) {
-				uni.createVideoContext(id).pause()
+			playVedio: function (path, ratio) {
+				let videoContext = uni.createVideoContext("screenVideo", this)
+				this.playVideoUrl = path
+				this.showVideoPlay = true
+				setTimeout(() => {
+					videoContext.play()
+					videoContext.requestFullScreen({ direction: 0})
+				}, 200)
+			},
+			screenChange: function (e) {
+				let fullScreen = e.detail.fullScreen; //值true为进入全屏，false为退出全屏
+				if (!fullScreen) {
+				  //退出全屏
+				  this.showVideoPlay = false;   // 隐藏播放盒子
+				}
 			},
 			...mapActions(['getUserInfo', 'getChatList']),
 			_nextPage: function () {
@@ -260,15 +285,6 @@
 							// console.log('没有')
 						}
 					})
-					// this.progressList.forEach(item => {
-					// 	// console.log(item.path)
-					// 	if (res.path === item.path) {
-					// 		item.progress = res.progress
-					// 		console.log(this.progressList)
-					// 	} else {
-					// 		this.progressList.push(res)
-					// 	}
-					// })
 				})
 			},
 			calculateProportion: function (w, h, row) {
@@ -280,19 +296,6 @@
 				} else if(ratio < 1) {
 					return 'heightFix'
 				}
-			},
-			getImageInfo: async function (src) {
-				return new Promise((resolve, reject) => {
-					uni.getImageInfo({
-							src: src,
-							success: (res) => {
-								resolve(res)
-							},
-							fail: (err) => {
-								reject(err)
-							}
-					})
-				})
 			},
 			scrollToBottom: function () {
 				setTimeout(() => {
@@ -313,41 +316,7 @@
 				}, 100)
 				
 			},
-			sendChange: function (){
-				let reg = /^(?!(\s+$))/ //不能全是空格
-				if (this.sendMsg.length > 0 && reg.test(this.sendMsg)) {
-					this.showSendBtn = true
-					this.showFocus = true
-				} else {
-					this.showSendBtn = false
-				}
-			},
-			_getMsg: function () {
-				this.socket.on('getMassage', async data => {
-					if (data.userId === this.sendUserInfo.id && this.getMsgFalg === true) {
-						if (data.msgType === 2 || data.msgType === 3) {
-							await this.downloadImg(data.path).then( res => {
-								data.path = res.savedFilePath
-							})
-						}
-						data.hot = 0
-						await this.chatData.push(data)
-						await this.chatData.forEach(i => {
-							if(i.msgType === 2) {
-								this.imgUrls.push(i.path)
-							}
-						})
-						await uni.setStorage({key: data.sendId + '_' + data.userId,data: this.chatData})
-						await uni.$emit('setTabBarItem')
-						await this.$nextTick(function(){
-							this.scrollToView = 'msg' + (this.chatData.length - 1)
-						})
-					}
-				})
-			},
 			bigView: function () {
-				this.showIconFlie = false
-				
 			},
 			stopBigView: function () {
 				
@@ -374,8 +343,8 @@
 					}
 				});
 			},
-			// 接收图片并且下载
-			downloadImg: function(imgUrl) {
+			// 接收文件并且下载
+			downloadFile: function(imgUrl) {
 				return new Promise((resolve, reject) => {
 					uni.downloadFile({
 					url: imgUrl,
@@ -383,8 +352,10 @@
 						uni.saveFile({
 							tempFilePath: res.tempFilePath,
 							success: function(red) {
-								// console.log(red.savedFilePath)
 								resolve(red)
+							},
+							fail: (err) => {
+								reject(err)
 							}
 						});
 					},
@@ -393,12 +364,6 @@
 					}
 				})
 			 })
-			},
-			onFocus: function () {
-				this.showFocus = true
-			},
-			onBlur: function () {
-				this.showFocus = false
 			},
 			onChange: function(e) {
 				console.log(e.detail)
@@ -475,10 +440,19 @@
 						return false
 					}
 				}
+			},
+			videoTimeFormat: function (time) {
+				if(time > 0) {
+					let m = parseInt(Math.round(time) / 60)
+					let s = Math.round(time) % 60
+					return m + ':' + s
+				} else {
+					return 0
+				}
 			}
 		},
 		onUnload:function () {
-			this.getMsgFalg = false
+			// uni.$emit('setTabBarItem')
 			uni.$off('getSendData')
 		}
 	}
@@ -490,7 +464,7 @@
 
 <style lang="scss">
 	page {
-		background-color: #ededed;
+		background-color: #FFFFFF;
 	}
 	.flex-direction {
 		flex-direction: row-reverse;
@@ -524,6 +498,9 @@
 	@keyframes movea {
 	    from {transform: rotate(0deg);}
 	    to {transform: rotate(360deg);}
+	}
+	#scrollview {
+		background-color: #ededed;
 	}
 	.chat-list {
 		display: flex;
@@ -585,6 +562,38 @@
 								image {
 									border-radius: 10rpx;
 									background-color: #FFFFFF;
+								}
+								.video-bg {
+									display: flex;
+									position: relative;
+									border-radius: 10rpx;
+									.video-bg-2:active {
+										background-color: #CCCCCC!important;
+										border-radius: 10rpx;
+										opacity: 0.2;
+									}
+									.play-btn {
+										display: block;
+										width: 100rpx;
+										height: 100rpx;
+										border-radius: 50%; 
+										background-color: transparent; 
+										margin: 0 auto; 
+										align-self: center;
+									}
+									.video-duration {
+										display: inline-block;
+										width: 100rpx;
+										height: 30rpx;
+										line-height: 30rpx;
+										position: absolute;
+										bottom: 10rpx;
+										right: 10rpx;
+										text-align: right;
+										font-size: 24rpx;
+										z-index: 9;
+										color: #FFFFFF;
+									}
 								}
 								.recorder-msg {
 									position: relative;
@@ -681,20 +690,27 @@
 										top: 28rpx;
 									}
 								}
-								.max {
-									max-width: 400rpx;
-									max-height: 320rpx;
-								}
-								.small {
-									max-height: 160rpx;
-								}
-								.min {
-									max-height: 80rpx;
-								}
 						}
 					}
 		}
 		
 	}
-	
+	.max {
+		max-width: 400rpx;
+		max-height: 320rpx;
+	}
+	.small {
+		max-height: 160rpx;
+	}
+	.min {
+		max-height: 80rpx;
+	}
+	.horizontal  {
+		width: 360rpx;
+		height: 200rpx;
+	}
+	.vertical {
+		width: 216rpx;
+		height: 306rpx;
+	}
 </style>
