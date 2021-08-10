@@ -90,7 +90,6 @@
 					x: 0,
 					y: 0
 				},
-				text: 'uni-app',
 				sendInfo: [
 					{
 						"id": 1,
@@ -155,6 +154,10 @@
 		created() {
 		},
 		mounted(){
+			uni.$on('hideFileList', res => {
+				this.showIconFile = res
+				uni.$emit('showFileList', res)
+			})
 		},	
 		methods: {
 			// selectFileType: function (id) {
@@ -237,9 +240,6 @@
 				} else if (msgType === 4) {
 					uni.$emit('getSendData', sendNewMsg)
 				}
-				this.$nextTick(function(){
-					// this.scrollToBottom()
-				})
 			},
 			_generateMixed: function() {
 				let res = ""
@@ -251,8 +251,7 @@
 			},
 			_addPlus: function () {
 				this.showIconFile = !this.showIconFile
-				uni.$emit('showFile', this.showIconFile)
-				// this.scrollToBottom()
+				uni.$emit('showFileList', this.showIconFile)
 			},
 			stopBigView: function (e) {
 				console.log(e)
@@ -269,10 +268,9 @@
 				if (id === 1) {
 					uni.chooseImage({
 					    count: 9, //默认9
-					    sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
+					    sizeType: ['original'], //可以指定是原图还是压缩图，默认二者都有 'original', 'compressed'
 					    sourceType: ['album'], //从相册选择
 					    success: res => {
-							console.log(res)
 							const tempFilePaths = res.tempFilePaths;
 							res.tempFilePaths.forEach(item => {
 								this._sendMsg(2, item)

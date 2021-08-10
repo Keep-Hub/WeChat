@@ -1,17 +1,17 @@
 <template>
 	<view>
-		<view class="user-avatar margin-bt">
+		<view class="user-avatar margin-bt" @tap="toInformation()">
 			<view class="left">
-				<image src="../../static/lufei.jpg" mode=""></image>
+				<image :src="userInfo.avatar" mode=""></image>
 			</view>
 			<view class="right">
 				<view class="nick-name">
-					Keep
+					{{userInfo.nickName}}
 				</view>
 				<view class="we-chat-nub">
 					<view class="number">
 						<view class="o-f">
-							微信号：1743413502微信号：1743413502微信号：1743413502微信号：1743413502
+							微信号：{{userInfo.mail}}
 						</view>
 					</view>
 					<view class="qr-code">
@@ -40,6 +40,7 @@
 </template>
 
 <script>
+	import {mapState, mapActions} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -101,6 +102,9 @@
 				]
 			}
 		},
+		computed: {
+		    ...mapState(['userInfo'])
+		},
 		onReady() {
 			uni.setNavigationBarColor({
 				frontColor: "#000000",	//文字颜色
@@ -108,6 +112,11 @@
 			})
 		},
 		methods: {
+			toInformation: function () {
+				uni.navigateTo({
+				    url: "./information/information"
+				});
+			},
 			bindClick: function (item){
 				console.log(item)
 				uni.navigateTo({

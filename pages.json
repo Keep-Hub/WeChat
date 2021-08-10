@@ -123,6 +123,32 @@
 		    
 		},
 		{
+		    "path" : "pages/mine/information/information",
+		    "style" :                                                                                    
+				{
+					"navigationBarTitleText": "个人信息",
+					"enablePullDownRefresh": false,
+					"app-plus": {
+						"titleNView": {
+						}
+					}
+				}
+		    
+		},
+		{
+		    "path" : "pages/mine/information/qrCode",
+		    "style" :                                                                                    
+				{
+					"navigationBarTitleText": "二维码名片",
+					"enablePullDownRefresh": false,
+					"app-plus": {
+						"titleNView": {
+						}
+					}
+				}
+		    
+		},
+		{
 		    "path": "pages/logon/login",
 		    "style": {
 				"enablePullDownRefresh": false,
@@ -144,6 +170,15 @@
 				}
 		    
 		}
+        ,{
+            "path" : "pages/find/queryFriend/friendInfo",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"tabBar": {
 	    "color": "#010101",

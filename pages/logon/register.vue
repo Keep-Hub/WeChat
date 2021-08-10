@@ -1,10 +1,10 @@
 <template>
 	<view class="register">
 		<view class="last-step" v-if="!nextStep" @tap="_lastStep">上一步</view>
+		<view class="last-step" v-else @tap=_toLogin()>取消</view>
 		<view v-if="nextStep">
 			<view class="register-title">用邮箱注册</view>
-			<u-avatar :src="src" mode="square" :show-level="true" level-icon="camera"></u-avatar>
-			<!-- <u-upload :action="action" :file-list="fileList" ></u-upload> -->
+			<u-avatar :src="src" mode="square" :show-level="true" :level-icon="src ? '' : 'camera'" @tap="selectAvatar()"></u-avatar>
 			<u-field
 				v-model="email"
 				label="邮箱"
@@ -89,6 +89,32 @@ export default {
 		// document.querySelector('.uni-page-head-hd').style.display = 'none'
 	},
 	methods: {
+		selectAvatar () {
+			uni.chooseImage({
+			    count: 1, //默认9
+			    sourceType: ['album'], //从相册选择
+				crop: {
+					quality: 100,
+					width: 200,
+					height: 200,
+					resize: false
+				},
+			    success: (res) => {
+					uni.uploadFile({
+							url: 'http://10.10.20.128:8668/sendUploadFile', //仅为示例，非真实的接口地址
+							filePath: res.tempFilePaths[0],
+							fileType: 'image',
+							name: 'file',
+							formData: {
+								fileType: 2
+							},
+							success: (uploadRes) => {
+								this.src = JSON.parse(uploadRes.data).normogram
+							}
+						})
+			    }
+			});
+		},
 		_emailTip (e) {
 			if (e.length > 0) {
 				this.showEmailTip = true
@@ -190,6 +216,7 @@ export default {
 							mail: this.email,
 							nickName: this.nickName,
 							password: this.password,
+							avatar: this.src
 						}
 						logonApi.register(params).then(data => {
 							if (data.code === 2000) {
@@ -224,6 +251,11 @@ export default {
 		},
 		showHidePassWord () {
 			this.hidePassword = !this.hidePassword
+		},
+		_toLogin () {
+			uni.navigateTo({
+			    url: '../logon/login'
+			});
 		}
 	}
 }	
@@ -236,10 +268,11 @@ export default {
 		}
 		.register {
 			padding: 0 50rpx;
+			position: relative;
 			.last-step {
 				color: #19BE6B;
-				position: absolute;
-				top: 50rpx;
+				position: fixed;
+				top: 60rpx;
 			}
 		}
 		.register-title {
@@ -262,7 +295,7 @@ export default {
 		}
 		.btn {
 			width: 100%!important; 
-			margin: 80rpx 0; 
+			margin: 80rpx 0 40rpx 0; 
 			height: 80rpx!important; 
 			font-size: 34rpx!important;
 		}

@@ -88,6 +88,11 @@
 			linkSocketMsg: function () {
 				this.socket.on('getMassage', async data => {
 					//#ifdef APP-PLUS
+					uni.vibrateLong({
+					    success: function () {
+					        console.log('震动');
+					    }
+					});
 					if (data.msgType === 3) {
 							await this.downloadFile(data.thumbnail).then( res => {
 								data.thumbnail = res.savedFilePath

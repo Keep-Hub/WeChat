@@ -90,7 +90,15 @@
 				uni.startPullDownRefresh();
 				this.init()
 		    },
-			watch: {
+			onNavigationBarButtonTap(e) {
+				console.log(e)
+				uni.scanCode({
+				    onlyFromCamera: true,
+				    success: function (res) {
+				        console.log('条码类型：' + res.scanType);
+				        console.log('条码内容：' + res.result);
+				    }
+				});
 			},
 			onShow () {
 				//获取网络类型

@@ -3,8 +3,8 @@
 		<scroll-view 
 		@scrolltoupper="_nextPage()" 
 		:upper-threshold="50" 
-		@tap="bigView()" 
-		@touchstart="bigView()" 
+		@tap="tapScrollView()"
+		@touchstart="tapScrollView()"
 		id="scrollview" 
 		scroll-y="false" 
 		:style="{height: (style.contentViewHeight*2 + chatScreen) + 'rpx', 'padding-bottom': (scrollPadding ? '640rpx' : '0rpx')}" 
@@ -39,8 +39,8 @@
 								</view>
 								<image
 									 v-else-if="item.msgType === 2"
-									 class="image-zoom" 
 									 :class="item.height >= 320? 'max' : (item.height > 60 ? 'small' : 'min')"
+									 style="margin-bottom: 20rpx;"
 									 :src="item.path"
 									 ref="imgSize"
 									 @tap="onPreviewImage(item.path, item)"
@@ -115,7 +115,6 @@
 				scrollTop: '9999',
 				autoplay: false,
 				duration: 300,
-				text: 'uni-app',
 				imgUrls: [], // 预览图片路径集合
 				scrollPadding: false,
 				style: {
@@ -128,9 +127,9 @@
 				 allChatData: [],
 			}
 		},
-		onLoad(option) {
+		async onLoad(option) {
 			this.sendUserInfo = JSON.parse(decodeURIComponent(option.item));
-			this.init()
+			await this.init()
 		},
 		onShow () {
 		},
@@ -160,6 +159,10 @@
 			}
 			uni.$on('chatRoomReception', res => {
 				this.chatData.push(res)
+				if (res.msgType === 2) {
+					this.imgUrls.push(res.path)
+				}
+				this.scrollAnimation = true
 				this.$nextTick(function(){
 					this.scrollToView = 'msg' + (this.chatData.length - 1)
 				})
@@ -175,26 +178,35 @@
 					await this.downloadFile(data.path).then( res => {
 						data.path = res.savedFilePath
 					})
+					await this.imgUrls.push(data.path)
+				}
+				//#endif
+				//#ifdef H5
+				if (data.msgType === 2) {
+					await this.imgUrls.push(data.path)
 				}
 				//#endif
 				await this.chatData.push(data)
 				await uni.setStorageSync(data.userId + '_' + data.sendId, this.chatData)
 				await uni.$emit('updataMsg', data)
 				this.$nextTick(function(){
+					this.scrollAnimation = true
 					this.scrollToView = 'msg' + (this.chatData.length - 1)
 				})
 			})
 			// 点击文件框的时候向上撑开
-			uni.$on('showFile', (data) => {
-				this.scrollPadding = data	
+			uni.$on('showFileList', (data) => {
+				this.scrollPadding = data
 				this.$nextTick(function() {
 					uni.pageScrollTo({scrollTop: 99999, duration: 0})
-					
 				});
 			})
 			// this.timeConversion()
 		},	
 		methods: {
+			tapScrollView: function () {
+				uni.$emit('hideFileList', false)
+			},
 			// videoUrl->视频链接 ratio->生成图片的大小比例 quality->图片质量 0.1 - 1
 			videoToImg (videoUrl, ratio, quality) {
 				return new Promise((resolve, reject) => {
@@ -242,6 +254,7 @@
 							this.chatData.unshift(i)
 						})
 						this.loading = false
+						this.scrollAnimation = false
 						this.$nextTick(function(){
 							this.scrollToView = 'msg' + (nowPageData.length - 2)
 						})
@@ -261,22 +274,17 @@
 					  return false
 				  }
 			},
-			init: function () {
-				uni.getStorage({
-					key: this.userInfo._id + '_' + this.sendUserInfo.id,
-					success: (res) => {
-						this.allChatData = res.data;
-						this.chatData = this.getPages(this.pageNub)
-						this.chatData.forEach(i => {
-							if(i.msgType === 2) {
-								this.imgUrls.push(i.path)
-							}
-						})
-						this.$nextTick(function(){
-							this.scrollToView = 'msg' + (this.chatData.length - 1)
-						})
+			init: async function () {
+				this.allChatData = await uni.getStorageSync(this.userInfo._id + '_' + this.sendUserInfo.id)
+				this.chatData = await this.getPages(this.pageNub)
+				await this.allChatData.forEach(i => {
+					if(i.msgType === 2) {
+						this.imgUrls.push(i.path)
 					}
-				});	
+				})
+				this.$nextTick(function(){
+					this.scrollToView = 'msg' + (this.chatData.length - 1)
+				})
 				uni.$on('listenUpdateProgress', res => {
 					this.chatData.slice(this.chatData.length - 9,this.chatData.length).forEach(item => {
 						if (item.msg === res.path) {
@@ -297,33 +305,28 @@
 					return 'heightFix'
 				}
 			},
-			scrollToBottom: function () {
-				setTimeout(() => {
-					let that = this;
-					let query = uni.createSelectorQuery();
-					query.selectAll('.chat-list').boundingClientRect();
-					query.select('#scrollview').boundingClientRect();
-					query.exec((res) => {
-						that.style.mitemHeight = 0;
-						res[0].forEach((rect) => that.style.mitemHeight = that.style.mitemHeight + rect.height + 60)   //获取所有内部子元素的高度
-		　　　　　　　　　　 // 因为vue的虚拟DOM 每次生成的新消息都是之前的，所以采用异步setTimeout    主要就是添加了这红字
-		　　　　　　　　　　 setTimeout(() => {
-						　　if (that.style.mitemHeight > (that.style.contentViewHeight - 100)) {   //判断子元素高度是否大于显示高度
-							　　that.scrollTop = that.style.mitemHeight - that.style.contentViewHeight    //用子元素的高度减去显示的高度就获益获得序言滚动的高度
-						　　}
-		　　　　　　　　　}, 10)
-		　　　　　　　})
-				}, 100)
+		// 	scrollToBottom: function () {
+		// 		setTimeout(() => {
+		// 			let that = this;
+		// 			let query = uni.createSelectorQuery();
+		// 			query.selectAll('.chat-list').boundingClientRect();
+		// 			query.select('#scrollview').boundingClientRect();
+		// 			query.exec((res) => {
+		// 				that.style.mitemHeight = 0;
+		// 				res[0].forEach((rect) => that.style.mitemHeight = that.style.mitemHeight + rect.height + 60)   //获取所有内部子元素的高度
+		// 　　　　　　　　　　 // 因为vue的虚拟DOM 每次生成的新消息都是之前的，所以采用异步setTimeout    主要就是添加了这红字
+		// 　　　　　　　　　　 setTimeout(() => {
+		// 				　　if (that.style.mitemHeight > (that.style.contentViewHeight - 100)) {   //判断子元素高度是否大于显示高度
+		// 					　　that.scrollTop = that.style.mitemHeight - that.style.contentViewHeight    //用子元素的高度减去显示的高度就获益获得序言滚动的高度
+		// 				　　}
+		// 　　　　　　　　　}, 10)
+		// 　　　　　　　})
+		// 		}, 100)
 				
-			},
-			bigView: function () {
-			},
-			stopBigView: function () {
-				
-			},
-			onPreviewImage: function (index, row) {
+		// 	},
+			onPreviewImage: async function (index, row) {
 				let currentIndex = 0
-				this.imgUrls.forEach((item, i) => {
+				await this.imgUrls.forEach((item, i) => {
 					if(item === index) {
 						currentIndex = i
 					}
@@ -445,7 +448,7 @@
 				if(time > 0) {
 					let m = parseInt(Math.round(time) / 60)
 					let s = Math.round(time) % 60
-					return m + ':' + s
+					return m + ':' + (s > 10 ? s : '0' + s)
 				} else {
 					return 0
 				}
@@ -453,6 +456,7 @@
 		},
 		onUnload:function () {
 			// uni.$emit('setTabBarItem')
+			this.scrollAnimation = false
 			uni.$off('getSendData')
 		}
 	}
@@ -567,6 +571,7 @@
 									display: flex;
 									position: relative;
 									border-radius: 10rpx;
+									margin-bottom: 20rpx;
 									.video-bg-2:active {
 										background-color: #CCCCCC!important;
 										border-radius: 10rpx;

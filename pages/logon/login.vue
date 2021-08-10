@@ -37,6 +37,11 @@
 		<u-button class="btn" size="medium"  type="success" @tap="_TOKEN">清除本地</u-button>
 		<u-modal v-model="showModal" :content="content" :show-cancel-button="true" :show-title="false" @confirm="confirmModel" @cancel="cancelModel"></u-modal>
 		<u-toast ref="uToast"/>
+		<view style="width: 100%;text-align: center;color: #999999;position: fixed; bottom: 50rpx; left: 0;">
+			<text @tap="_toRegister()">注册账号</text>
+			<text>丨</text>
+			<text>忘记密码</text>
+		</view>
 	</view>
 </template>
 
@@ -145,6 +150,11 @@ export default {
 		_TOKEN () {
 			uni.clearStorage()
 		},
+		_toRegister () {
+			uni.navigateTo({
+			    url: '../logon/register'
+			});
+		},
   		confirmModel () {
 		},
 		cancelModel () {
@@ -168,6 +178,7 @@ export default {
 		}
 		.login {
 			padding: 0 50rpx;
+			position: relative;
 		}
 		.login-title {
 			font-size: 64rpx; 
@@ -188,7 +199,7 @@ export default {
 		}
 		.btn {
 			width: 100%!important; 
-			margin: 80rpx 0; 
+			margin: 80rpx 0 40rpx 0; 
 			height: 80rpx!important; 
 			font-size: 34rpx!important;
 		}
