@@ -10,8 +10,8 @@
 						<view v-if="showSelect" style="margin-right: 20rpx;">
 							<uni-icons :type="item.checked ? 'checkbox-filled' : 'circle'" :color="item.checked ? '#007aff' : '#aaa'" size="24" />
 						</view>
-						<image :src="item.name.img" mode="" style="width: 38px;height: 38px;border-radius: 10rpx; float: left;"></image>
-						<view class="uni-indexed-list__item-content">{{ item.name.nickName }}</view>
+						<image :src="item.data.avatar" mode="" style="width: 38px;height: 38px;border-radius: 10rpx; float: left;"></image>
+						<view class="uni-indexed-list__item-content">{{ item.data.nickName }}</view>
 					</view>
 				</view>
 			</view>

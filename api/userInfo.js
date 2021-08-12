@@ -1,7 +1,7 @@
 let domain = 'http://10.10.20.128:8668'
 
-function getBuddyList(params) {
-	return requestInterface(domain + '/getBuddyList','POST',params)
+function getFriendList(params) {
+	return requestInterface(domain + '/getFriendList','POST',params)
 }
 function getVerifyBuddy(params) {
 	return requestInterface(domain + '/getVerifyBuddy','POST',params)
@@ -24,6 +24,6 @@ function requestInterface(u,m,d) {
 	})
 }
 export default {
-	getBuddyList,
+	getFriendList,
 	getVerifyBuddy
 }

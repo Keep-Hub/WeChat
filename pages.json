@@ -171,10 +171,26 @@
 		    
 		}
         ,{
-            "path" : "pages/find/queryFriend/friendInfo",
+            "path" : "pages/addressList/queryFriend/friendInfo",
             "style" :                                                                                    
             {
                 "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        },{
+            "path" : "pages/addressList/queryFriend/queryFriend",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "",
+                "enablePullDownRefresh": false
+            }
+            
+        },{
+            "path" : "pages/addressList/queryFriend/newFriend",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "新的朋友",
                 "enablePullDownRefresh": false
             }
             

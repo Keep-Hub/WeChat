@@ -90,7 +90,7 @@
 				uni.getStorage({
 					key: 'userInfo',
 					success: (res) => {
-						this.socket.emit('leaveRoom',{"_id": res.data._id})
+						this.socket.emit('leaveRoom',{"openid": res.data.openid})
 					},
 					fail: (err) => {
 						console.log('无用户信息')

@@ -2,11 +2,11 @@
 	<view>
 		<view class="user-avatar" @tap="toInformation()">
 			<view class="left">
-				<image :src="userInfo.avatar" mode=""></image>
+				<image :src="friendInfo.avatar" mode=""></image>
 			</view>
 			<view class="right">
 				<view class="nick-name">
-					{{userInfo.nickName}}
+					{{friendInfo.nickName}}
 				</view>
 				<view class="we-chat-nub">
 					地区：广东 广州
@@ -24,7 +24,10 @@
 			</view>
 		</view>
 		<view class="list">
-			<view style="width: 100%;text-align: center;font-size: 32rpx;padding: 30rpx 0; color: #5b6a91; font-weight: bolder; letter-spacing: 2rpx;" @tap="_quitLogin">
+			<view v-if="isFriend === '1'" style="width: 100%;text-align: center;font-size: 32rpx;padding: 30rpx 0; color: #5b6a91; font-weight: bolder; letter-spacing: 2rpx;" @tap="sendMsg">
+				发送消息
+			</view>
+			<view v-else style="width: 100%;text-align: center;font-size: 32rpx;padding: 30rpx 0; color: #5b6a91; font-weight: bolder; letter-spacing: 2rpx;" @tap="addFriend">
 				添加到通讯录
 			</view>
 		</view>
@@ -32,6 +35,7 @@
 </template>
 
 <script>
+	import Friend from '../../../api/friend.js'
 	import {mapState, mapActions} from 'vuex'
 	export default {
 		data() {
@@ -64,11 +68,19 @@
 						borderAndMargin: false,
 						jumpURL: ''
 					}
-				]
+				],
+				friendInfo: {},
+				isFriend: ''
 			}
 		},
 		computed: {
 		    ...mapState(['userInfo'])
+		},
+		onLoad(option) {
+			if (option.isFriend) {
+				this.isFriend = option.isFriend
+				this.friendInfo = JSON.parse(decodeURIComponent(option.friendInfo))
+			}
 		},
 		onReady() {
 			uni.setNavigationBarColor({
@@ -77,6 +89,7 @@
 			})
 		},
 		methods: {
+			sendMsg: function() {},
 			toInformation: function () {
 				uni.navigateTo({
 				    url: "./information/information"
@@ -88,6 +101,21 @@
 				    url: item.jumpURL
 				});
 			},
+			addFriend: function () {
+				let sendTo = {
+					userId: this.userInfo.openid,
+					avatar: this.userInfo.avatar,
+					nickName: this.userInfo.nickName,
+					friendId: this.friendInfo.openid,
+					isAgree: 0,// 是否同意添加好友 0-未处理 1-同意 2- 不同意
+					isRead: 1,
+					applyTime: new Date(),
+				}
+				Friend.sendFriendApply(sendTo).then(res => {
+					console.log(res.result)
+				})
+				this.socket.emit('addNewFriend', sendTo)
+			}
 		}
 	}
 </script>

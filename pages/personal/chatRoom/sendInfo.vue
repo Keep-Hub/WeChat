@@ -190,7 +190,7 @@
 			_sendMsg: async function (msgType, msg, voiceT) {
 				let sendNewMsg = {
 						id: this._generateMixed(),
-						userId: this.userInfo._id,
+						userId: this.userInfo.openid,
 						sendId: this.sendUserInfo.id,
 						img: '../../../static/lufei.jpg',
 						time: new Date(),

@@ -42,6 +42,7 @@
 
 <script>
 	import {mapState, mapActions} from 'vuex'
+	import addFriend from '../../api/friend.js'
 	import userInfoApi from '../../api/userInfo.js'
 	export default {
 		data() {
@@ -91,12 +92,23 @@
 				this.init()
 		    },
 			onNavigationBarButtonTap(e) {
-				console.log(e)
 				uni.scanCode({
-				    onlyFromCamera: true,
-				    success: function (res) {
-				        console.log('条码类型：' + res.scanType);
-				        console.log('条码内容：' + res.result);
+				    onlyFromCamera: false,
+				    success: (res) => {
+						console.log(res)
+						if (res.scanType === "QR_CODE") {
+							let sendTo = {
+								userId: this.userInfo.openid,
+								friendId: res.result,
+							}
+							addFriend.queryUserDetail(sendTo).then(res => {
+								uni.navigateTo({
+								    url: '../addressList/queryFriend/friendInfo?friendInfo=' + encodeURIComponent(JSON.stringify(res.result)) + "&isFriend=" + res.isFriend
+								});
+							})
+						} else {
+							console.log('扫码失败')
+						}
 				    }
 				});
 			},
@@ -158,12 +170,12 @@
 					});
 					if(item.hot > 0) {
 						uni.getStorage({
-							key: this.userInfo._id + '_' + item.id,
+							key: this.userInfo.openid + '_' + item.id,
 							success: (res) => {
 								res.data.forEach(i => {
 									i.hot = 0
 								})
-								uni.setStorageSync(this.userInfo._id + '_' + item.id, res.data)
+								uni.setStorageSync(this.userInfo.openid + '_' + item.id, res.data)
 								uni.$emit('setTabBarItem')
 							}
 						})

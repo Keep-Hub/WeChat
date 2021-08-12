@@ -16,16 +16,17 @@
 				<view v-if="fiveMinutesApart(item.time, index, chatData)" class="send-time">
 					<text>{{timeConversion(item.time)}}</text>
 				</view>
-				<view class="chat-list" :class="item.userId === userInfo._id? 'flex-direction' : ''">
+				<view class="chat-list" :class="item.userId === userInfo.openid? 'flex-direction' : ''">
 					<view class="left">
-						<image :src="item.img" mode="" @tap="init()"></image>
+						<image v-if="item.userId === userInfo.openid" :src="userInfo.avatar" mode="" @tap="init()"></image>
+						<image v-else :src="sendUserInfo.img" mode="" @tap="init()"></image>
 					</view>
-					<view class="right" :class="item.userId === userInfo._id? 'right-row' : 'left-row'">
-						<view class="chat-bubble" :class="item.userId === userInfo._id && item.msgType === 1 ? (item.msgType === 1 ?'bg-color-g' : '') : (item.msgType === 1 ?'bg-color-b' : '')">
-							<text class="square" :class="item.userId === userInfo._id && item.msgType === 1? (item.msgType === 1 ?'right' : '') : (item.msgType === 1 ?'left' : '')"></text>
+					<view class="right" :class="item.userId === userInfo.openid? 'right-row' : 'left-row'">
+						<view class="chat-bubble" :class="item.userId === userInfo.openid && item.msgType === 1 ? (item.msgType === 1 ?'bg-color-g' : '') : (item.msgType === 1 ?'bg-color-b' : '')">
+							<text class="square" :class="item.userId === userInfo.openid && item.msgType === 1? (item.msgType === 1 ?'right' : '') : (item.msgType === 1 ?'left' : '')"></text>
 							<view class="msg-info">
 									<u-circle-progress
-										 v-if="(item.msgType === 2 || item.msgType === 3) && item.userId === userInfo._id"
+										 v-if="(item.msgType === 2 || item.msgType === 3) && item.userId === userInfo.openid"
 										 bg-color="transparent"
 										 active-color="#cccccc"
 										 :percent="item.progress"
@@ -58,17 +59,17 @@
 									  	<text class="video-duration">{{videoTimeFormat(item.videoDuration)}}</text>
 									  </view>
 								 </view>
-								 <view class="recorder-msg" @tap="playVoice(item)" v-else-if="item.msgType === 4" :class="item.userId === userInfo._id && item.msgType === 4 ? (item.msgType === 4 ?'bg-color-g' : '') : (item.msgType === 4 ?'bg-color-b' : '')">
-									<text class="voice-time" v-if="item.userId === userInfo._id" style="text-align: right;" :style="{ width: (item.voiceTime * 4) + 'rpx' }">{{item.voiceTime}}″</text>
-									<view class="voice-box" :class="item.userId === userInfo._id && item.msgType === 4 ? 'f-r' : ''">
+								 <view class="recorder-msg" @tap="playVoice(item)" v-else-if="item.msgType === 4" :class="item.userId === userInfo.openid && item.msgType === 4 ? (item.msgType === 4 ?'bg-color-g' : '') : (item.msgType === 4 ?'bg-color-b' : '')">
+									<text class="voice-time" v-if="item.userId === userInfo.openid" style="text-align: right;" :style="{ width: (item.voiceTime * 4) + 'rpx' }">{{item.voiceTime}}″</text>
+									<view class="voice-box" :class="item.userId === userInfo.openid && item.msgType === 4 ? 'f-r' : ''">
 										<view class="voice-symbol">
 											<view class="voice-circle first"></view>
 											<view class="voice-circle second" :class="item.move === 1 ? 'second-animation' : ''"></view>
 											<view class="voice-circle third" :class="item.move === 1 ? 'third-animation' : ''"></view>
 										</view>
 									</view>
-									<text class="voice-time" v-if="item.userId === userInfo._id" :style="{ width: (item.voiceTime * 4) + 'rpx' }">{{item.voiceTime}}″</text>
-									<text class="voice-red-hot" v-if="item.userId === userInfo._id && item.hot === true"></text>
+									<text class="voice-time" v-if="item.userId === userInfo.openid" :style="{ width: (item.voiceTime * 4) + 'rpx' }">{{item.voiceTime}}″</text>
+									<text class="voice-red-hot" v-if="item.userId === userInfo.openid && item.hot === true"></text>
 								 </view>
 							</view>	
 						</view>
@@ -109,7 +110,7 @@
 				loading: false,
 				loadAnimation: {},
 				chatScreen: 0,
-				sendUserInfo: null,
+				sendUserInfo: {},
 				chatData: [],
 				scrollAnimation: false, // 是否开启滚动动画
 				scrollTop: '9999',
@@ -181,18 +182,18 @@
 					await this.imgUrls.push(data.path)
 				}
 				//#endif
-				//#ifdef H5
-				if (data.msgType === 2) {
-					await this.imgUrls.push(data.path)
-				}
-				//#endif
-				await this.chatData.push(data)
+				// //#ifdef H5
+				// if (data.msgType === 2) {
+				// 	await this.imgUrls.push(data.path)
+				// }
+				// //#endif
+				await uni.$emit('chatRoomReception', data)
 				await uni.setStorageSync(data.userId + '_' + data.sendId, this.chatData)
 				await uni.$emit('updataMsg', data)
-				this.$nextTick(function(){
-					this.scrollAnimation = true
-					this.scrollToView = 'msg' + (this.chatData.length - 1)
-				})
+				// this.$nextTick(function(){
+				// 	this.scrollAnimation = true
+				// 	this.scrollToView = 'msg' + (this.chatData.length - 1)
+				// })
 			})
 			// 点击文件框的时候向上撑开
 			uni.$on('showFileList', (data) => {
@@ -271,17 +272,19 @@
 			      } else if (currentPage === totalPage) {
 			        return objData.slice(0, objData.length-(currentPage - 1)*pageSize)
 			      } else {
-					  return false
+					  return []
 				  }
 			},
 			init: async function () {
-				this.allChatData = await uni.getStorageSync(this.userInfo._id + '_' + this.sendUserInfo.id)
+				this.allChatData = await uni.getStorageSync(this.userInfo.openid + '_' + this.sendUserInfo.id)
 				this.chatData = await this.getPages(this.pageNub)
-				await this.allChatData.forEach(i => {
-					if(i.msgType === 2) {
-						this.imgUrls.push(i.path)
-					}
-				})
+				if (this.allChatData) {
+					await this.allChatData.forEach(i => {
+						if(i.msgType === 2) {
+							this.imgUrls.push(i.path)
+						}
+					})
+				}
 				this.$nextTick(function(){
 					this.scrollToView = 'msg' + (this.chatData.length - 1)
 				})
@@ -305,25 +308,6 @@
 					return 'heightFix'
 				}
 			},
-		// 	scrollToBottom: function () {
-		// 		setTimeout(() => {
-		// 			let that = this;
-		// 			let query = uni.createSelectorQuery();
-		// 			query.selectAll('.chat-list').boundingClientRect();
-		// 			query.select('#scrollview').boundingClientRect();
-		// 			query.exec((res) => {
-		// 				that.style.mitemHeight = 0;
-		// 				res[0].forEach((rect) => that.style.mitemHeight = that.style.mitemHeight + rect.height + 60)   //获取所有内部子元素的高度
-		// 　　　　　　　　　　 // 因为vue的虚拟DOM 每次生成的新消息都是之前的，所以采用异步setTimeout    主要就是添加了这红字
-		// 　　　　　　　　　　 setTimeout(() => {
-		// 				　　if (that.style.mitemHeight > (that.style.contentViewHeight - 100)) {   //判断子元素高度是否大于显示高度
-		// 					　　that.scrollTop = that.style.mitemHeight - that.style.contentViewHeight    //用子元素的高度减去显示的高度就获益获得序言滚动的高度
-		// 				　　}
-		// 　　　　　　　　　}, 10)
-		// 　　　　　　　})
-		// 		}, 100)
-				
-		// 	},
 			onPreviewImage: async function (index, row) {
 				let currentIndex = 0
 				await this.imgUrls.forEach((item, i) => {

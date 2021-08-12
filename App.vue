@@ -20,10 +20,10 @@
 				uni.$emit('networkStatus', res)
 				if (res.isConnected) {
 					this.$nextTick(function(){
-						this.joinSocket(this.userInfo._id)
+						this.joinSocket(this.userInfo.openid)
 					})
 				} else {
-					this.socket.emit('leaveRoom',{"_id": this.userInfo._id})
+					this.socket.emit('leaveRoom',{"openid": this.userInfo.openid})
 				}
 			});
 			this.$nextTick(function(){
@@ -32,7 +32,7 @@
 							url: './pages/logon/login'
 					})
 				} else if (this.userInfo !== '' && this.token !== '') {
-					this.joinSocket(this.userInfo._id)
+					this.joinSocket(this.userInfo.openid)
 				} else {
 					logonApi.testToken({token: this.token}).then(data => {
 						if (data.code === 2001) {
@@ -58,7 +58,7 @@
 				await this.getBadge(this.AllBadge)
 			})
 			uni.$on('toJoinSocket', res => {
-				this.joinSocket(res.result[0]._id)
+				this.joinSocket(res.result[0].openid)
 			})
 			uni.$on('updataMsg', res => {
 				this.updataMsg(res.sendId, res)
@@ -80,10 +80,21 @@
 						index: 0,
 					})
 				}
+				if (data.newApply > 0) {
+					uni.setTabBarBadge({
+						index: 1,
+						text: data.newApply >= 99 ? '99+' : data.newApply.toString()
+					})
+				} else {
+					uni.hideTabBarRedDot({
+						index: 1,
+					})
+				}
+				
 				// plus.runtime.setBadgeNumber(data.unreadMsg);
 			},
 			joinSocket: function (linkId) {
-				this.socket.emit('setRoom',{"_id": linkId})
+				this.socket.emit('setRoom',{"openid": linkId})
 			},
 			linkSocketMsg: function () {
 				this.socket.on('getMassage', async data => {
@@ -109,7 +120,6 @@
 						// 获取当前聊天的对象
 						let currentChatId = pages[pages.length - 1].options.item.indexOf(data.userId)
 						if (currentChatId !== -1) {
-							console.log(5)
 							data.hot = 0
 							uni.$emit('chatRoomReception', data)
 						}
@@ -117,19 +127,31 @@
 					}
 					let chatData = []
 					await uni.getStorage({
-						key: this.userInfo._id + '_' + data.userId,
+						key: this.userInfo.openid + '_' + data.userId,
 						success: (res) => {
 							chatData = res.data;
 							chatData.push(data)
-							uni.setStorageSync(this.userInfo._id + '_' + data.userId, chatData)
+							uni.setStorageSync(this.userInfo.openid + '_' + data.userId, chatData)
 							this.updataMsg(data.userId, data)
 						},
 						fail: (err) => {
 							chatData.push(data)
-							uni.setStorageSync(this.userInfo._id + '_' + data.userId, chatData)
+							uni.setStorageSync(this.userInfo.openid + '_' + data.userId, chatData)
 							this.updataMsg(data.userId, data)
 						}
 					})
+				})
+				this.socket.on('getAddNewFriend', data => {
+					let add = uni.getStorageSync(this.userInfo.openid + '_newFriend')
+					if (add === '') {
+						let addArr = []
+						addArr.push(data)
+						uni.setStorageSync(this.userInfo.openid + '_newFriend', addArr)
+					} else {
+						add.push(data)
+						uni.setStorageSync(this.userInfo.openid + '_newFriend', add)
+					}
+					uni.$emit('setTabBarItem')
 				})
 			},
 			// 接收图片并且下载
@@ -153,15 +175,15 @@
 			},
 			updataMsg: function (id, data) {
 				uni.getStorage({
-					key: this.userInfo._id + 'chatList',
+					key: this.userInfo.openid + 'chatList',
 					success: (res) => {
 						let findId = res.data.findIndex(item => item.id === id)
 						if (findId === -1) {
-							userInfoApi.getVerifyBuddy({_id: this.userInfo._id, sendId: id}).then(res => {
-								const row = res.result[0]
+							userInfoApi.getVerifyBuddy({openid: this.userInfo.openid, sendId: id}).then(res => {
+								const row = res.result
 								let n = {
-										id: row.buddyId,
-										img: row.img,
+										id: row.openid,
+										img: row.avatar,
 										name: row.nickName,
 										new: data.msg,
 										time: data.time,
@@ -172,8 +194,9 @@
 										clickBtnFlag: false,
 										clearTime: null
 									}
+									
 								this.chatList.push(n)
-								uni.setStorageSync(this.userInfo._id + 'chatList', this.chatList);
+								uni.setStorageSync(this.userInfo.openid + 'chatList', this.chatList);
 								uni.$emit('setTabBarItem')
 							})
 						} else {
@@ -183,16 +206,16 @@
 									item.time = data.time
 								}
 							})
-							uni.setStorageSync(this.userInfo._id + 'chatList', res.data);
+							uni.setStorageSync(this.userInfo.openid + 'chatList', res.data);
 							uni.$emit('setTabBarItem')
 						}
 					},
 					fail: (err) => {
-						userInfoApi.getVerifyBuddy({_id: this.userInfo._id, sendId: id}).then(res => {
-							const row = res.result[0]
+						userInfoApi.getVerifyBuddy({openid: this.userInfo.openid, sendId: id}).then(res => {
+							const row = res.result
 							let n = {
-									id: row.buddyId,
-									img: row.img,
+									id: row.openid,
+									img: row.avatar,
 									name: row.nickName,
 									new: data.msg,
 									time: data.time,
@@ -204,7 +227,7 @@
 									clearTime: null
 								}
 							this.chatList.push(n)
-							uni.setStorageSync(this.userInfo._id + 'chatList', this.chatList);
+							uni.setStorageSync(this.userInfo.openid + 'chatList', this.chatList);
 							uni.$emit('setTabBarItem')
 						})
 					}

@@ -39,29 +39,37 @@ const mutations = {
 	  // });
   },
   getChatList(state, data) {
-	  let list = uni.getStorageSync(state.userInfo._id + 'chatList')
+	  let list = uni.getStorageSync(state.userInfo.openid + 'chatList')
 	  state.chatList = list === '' ? [] : list,
 	  state.chatList.sort((a,b) => {
 	  	 return Date.parse(new Date(b.time)) - Date.parse(new Date(a.time))
 	  })
   },
   getAllBadge (state, data) {
+	  let nub = []
 	  state.chatList.forEach(item => {
-		  let nub = []
-		  state.chatList.forEach(item => {
-			  let row = uni.getStorageSync(state.userInfo._id + '_' + item.id)
-			  let itemNub = row.slice(row.length - 100, row.length).reduce((pre,cur)=>{
-								return pre+cur.hot	
-							},0)
-			  item.hot = itemNub
-			  nub.push(itemNub)
-		  })
-		  state.AllBadge.unreadMsg = nub.reduce((pre, cur) => {
-		  		  return pre + cur
-		  },0)
+	  			  let row = uni.getStorageSync(state.userInfo.openid + '_' + item.id)
+	  			  let itemNub = row.slice(row.length - 100, row.length).reduce((pre,cur)=>{
+	  								return pre+cur.hot	
+	  							},0)
+	  			  item.hot = itemNub
+	  			  nub.push(itemNub)
 	  })
-	  if (state.userInfo._id !== undefined) {
-		  uni.setStorageSync(state.userInfo._id + 'chatList', state.chatList)
+	  state.AllBadge.unreadMsg = nub.reduce((pre, cur) => {
+	  		  return pre + cur
+	  },0)
+	  if (state.userInfo.openid !== undefined) {
+		  uni.setStorageSync(state.userInfo.openid + 'chatList', state.chatList)
+	  }
+	  let row = uni.getStorageSync(state.userInfo.openid + '_newFriend')
+	  if (row !== '') {
+		  let newF = 0
+		  row.forEach(item => {
+			  if (item.isRead === 1) {
+				  newF++
+			  }
+		  })
+		  state.AllBadge.newApply = newF
 	  }
   }
 }

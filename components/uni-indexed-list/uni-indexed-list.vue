@@ -141,7 +141,7 @@
 					let items = value.data.map(item => {
 						let obj = {}
 						obj['key'] = value.letter
-						obj['name'] = item
+						obj['data'] = item
 						obj['itemIndex'] = index
 						index++
 						obj.checked = item.checked ? item.checked : false

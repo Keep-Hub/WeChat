@@ -72,7 +72,7 @@
 		},
 		onLoad() {
 			this.qrCode.icon = this.userInfo.avatar
-			this.qrCode.val = this.userInfo._id
+			this.qrCode.val = this.userInfo.openid
 		},
 		onReady() {
 			uni.setNavigationBarColor({
