@@ -50,8 +50,14 @@
 					]
 			}
 		},
-		onLoad(option) {
+		onLoad() {
 			this.nickSort(this.userInfo.openid)
+			uni.$on('updataFriendList', res => {
+				this.nickSort(this.userInfo.openid)
+			})
+		},
+		onShow() {
+			
 		},
 		computed: {
 		    ...mapState(['userInfo'])
@@ -93,8 +99,10 @@
 					let friends = []
 					let newArr = []
 					await res.result.forEach(item => {
-						item.friends[0].isStar = item.isStar
-						friends.push(item.friends[0])
+						if (item.isFriend === 1) {
+							item.friends[0].isStar = item.isStar
+							friends.push(item.friends[0])
+						}
 					})
 					uni.setNavigationBarTitle({
 					　　title: '通讯录(' + friends.length + ')'

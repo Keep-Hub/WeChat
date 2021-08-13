@@ -140,7 +140,7 @@ page {
 			}
 		}
 		.qr-code {
-			width: 460rpx;
+			width: 230px;
 			margin: 50rpx auto;
 		}
 	}

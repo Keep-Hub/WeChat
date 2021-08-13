@@ -149,6 +149,19 @@
 		    
 		},
 		{
+		    "path" : "pages/addressList/queryFriend/sendFriendApply",
+		    "style" :                                                                                    
+				{
+					"navigationBarTitleText": "申请添加朋友",
+					"enablePullDownRefresh": false,
+					"app-plus": {
+						"titleNView": {
+						}
+					}
+				}
+		    
+		},
+		{
 		    "path": "pages/logon/login",
 		    "style": {
 				"enablePullDownRefresh": false,

@@ -8,10 +8,10 @@
 					{{item.name}}
 				</view>
 				<view class="right-right">
-					<image v-if="item.imgType" src="http://10.10.20.128:8668/filePath/file-1628578301475.jpg" mode=""></image>
+					<image v-if="item.imgType" :src="userInfo.avatar" mode=""></image>
 					<image v-if="item.id === 4" style="width: 40rpx; height: 40rpx;" src="../../../static/commonImg/qr-code.png" mode=""></image>
-					<text v-if="item.id === 2">keep</text>
-					<text v-if="item.id === 3">1743413502@qq.com</text>
+					<text v-if="item.id === 2" style="display: block; width: 400rpx;">{{userInfo.nickName}}</text>
+					<text v-if="item.id === 3">{{userInfo.mail}}</text>
 				</view>
 				<view class="arrow">
 					<uni-icons type="arrowright" style="color: #b2b2b2"></uni-icons>
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-	import {mapActions} from 'vuex'
+	import {mapState,mapActions} from 'vuex'
 	export default {
 		data() {
 			return {
@@ -84,6 +84,9 @@
 				backgroundColor: "#F7F7F7"	//底部背景色
 			})
 		},
+		computed: {
+		    ...mapState(['userInfo'])
+		},
 		methods: {
 			...mapActions(['quitLogin']),
 			tapListID: function (row) {
@@ -134,6 +137,7 @@ page {
 			.right-right {
 				display: flex;
 				align-self: center;
+				text-align: right;
 				color: #999999;
 				image {
 					width: 120rpx;

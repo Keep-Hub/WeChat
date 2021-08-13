@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<view v-for="(item,index) in applyList" :key="index" class="user-avatar margin-bt" @tap="bindClick(item)">
+		<view v-for="(item,index) in applyList.reverse()" :key="index" class="user-avatar margin-bt" @tap="bindClick(item)">
 			<view class="left pd-20">
 				<image :src="item.avatar" mode=""></image>
 			</view>
@@ -9,7 +9,7 @@
 						{{item.nickName}}
 					</view>
 					<view class="new-msg">
-						我是b备注我是b备注我是b备注我是b备注我是b备注我是b备注我是b备注我是b备注
+						{{item.remark}}
 					</view>
 				</view>
 			<view class="right pd-20">
@@ -51,13 +51,20 @@
 					isFriend: 1
 				}
 				Friend.sendFriendApply(sendTo).then(res => {
-					console.log(res.result)
-					this.applyList.forEach(item => {
-						if (item.friendId === row.friendId) {
-							item.isAgree = 1
+					Friend.ApplyThroughFriend({userId: row.userId, friendId: this.userInfo.openid, isFriend: 1}).then(callBack => {
+						let send = {
+							userId: this.userInfo.openid,
+							friendId: row.userId,
 						}
+						uni.$emit('updataFriendList')
+						this.applyList.forEach(item => {
+							if (item.friendId === row.friendId) {
+								item.isAgree = 1
+							}
+						})
+						uni.setStorageSync(this.userInfo.openid + '_newFriend', this.applyList)
+						this.socket.emit('newFriendApply', send)
 					})
-					uni.setStorageSync(this.userInfo.openid + '_newFriend', this.applyList)
 				})
 			}
 		}

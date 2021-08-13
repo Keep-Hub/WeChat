@@ -109,12 +109,17 @@
 					friendId: this.friendInfo.openid,
 					isAgree: 0,// 是否同意添加好友 0-未处理 1-同意 2- 不同意
 					isRead: 1,
+					label: '',
+					remark: '',
 					applyTime: new Date(),
 				}
-				Friend.sendFriendApply(sendTo).then(res => {
-					console.log(res.result)
-				})
-				this.socket.emit('addNewFriend', sendTo)
+				uni.navigateTo({
+				    url: "./sendFriendApply?info=" + encodeURIComponent(JSON.stringify(sendTo))
+				});
+				// Friend.sendFriendApply(sendTo).then(res => {
+				// 	console.log(res.result)
+				// })
+				// this.socket.emit('addNewFriend', sendTo)
 			}
 		}
 	}

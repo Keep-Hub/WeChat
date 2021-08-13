@@ -10,11 +10,14 @@
 			//#ifdef H5
 			//#endif
 			// uni.clearStorage();
+			console.log('lan')
+			this.linkSocketMsg()
 		},
 		computed: {
 		    ...mapState(['userInfo','chatList','AllBadge', 'token'])
 		},
 		onShow: function() {
+			console.log('show')
 			//监听网络状态变化
 			uni.onNetworkStatusChange((res)=>{
 				uni.$emit('networkStatus', res)
@@ -51,7 +54,6 @@
 				}
 			})
 			this.getUserInfo()
-			this.linkSocketMsg()
 			uni.$on('setTabBarItem', async(res) => {
 				await this.getChatList()
 				await this.getAllBadge()
@@ -97,6 +99,7 @@
 				this.socket.emit('setRoom',{"openid": linkId})
 			},
 			linkSocketMsg: function () {
+				// 监听聊天信息接收
 				this.socket.on('getMassage', async data => {
 					//#ifdef APP-PLUS
 					uni.vibrateLong({
@@ -141,6 +144,7 @@
 						}
 					})
 				})
+				// 监听好友请求验证
 				this.socket.on('getAddNewFriend', data => {
 					let add = uni.getStorageSync(this.userInfo.openid + '_newFriend')
 					if (add === '') {
@@ -152,6 +156,10 @@
 						uni.setStorageSync(this.userInfo.openid + '_newFriend', add)
 					}
 					uni.$emit('setTabBarItem')
+				})
+				// 监听通过好友验证提示
+				this.socket.on('getNewFriendApply', data => {
+					uni.$emit('updataFriendList')
 				})
 			},
 			// 接收图片并且下载
